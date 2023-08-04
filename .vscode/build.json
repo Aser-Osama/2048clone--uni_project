@@ -1,0 +1,13 @@
+{
+    "command": "cl",
+    "args": [
+        "/EHsc",
+        "${workspaceFolder}/*.cpp",
+        "/Fe:",
+        "${workspaceFolder}/<Your Executable Name>",
+        "/I<path to SDL2 include directory>",
+        "/link",
+        "<path to SDL2 lib directory>/SDL2.lib",
+        "<path to SDL2 lib directory>/SDL2main.lib"
+    ]
+}
