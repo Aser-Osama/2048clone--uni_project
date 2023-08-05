@@ -35,7 +35,8 @@ namespace GameLogic
 		bool canMergeRemaining();
 		void printv();
 		void addNewTile();
-
+		bool canCreateTile();
+		std::vector<std::vector<Tile*>>* getBoard();
 		
 		//logic for moving is split into seprate functions for ease of reading
 		bool moveUpLogic();

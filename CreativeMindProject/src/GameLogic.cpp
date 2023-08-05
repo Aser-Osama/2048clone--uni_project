@@ -11,16 +11,16 @@ namespace GameLogic {
 	Tile::Tile(uint8_t num, uint8_t pos) { //never used
 		tileVal = num;
 		gridPos = pos;
-		tilePath = "CreativeMindProject\\Imgs\\(" + std::to_string(num) + ").bmp";
+		tilePath = "CreativeMindProject\\Imgs\\ (" + std::to_string(num) + ").bmp";
 	}
 	Tile::Tile(uint8_t pos) {
 		gridPos = pos;
-		uint8_t rand = std::rand() % 11;
+		int rand = std::rand() % 11;
 		if (rand == 10) {
-			tileVal = 1;
+			tileVal = 2;
 		}
 		else {
-			tileVal = 0;
+			tileVal = 1;
 		}
 	}
 	void Tile::doubleVal() {
@@ -68,10 +68,16 @@ namespace GameLogic {
 		this->resetMergeStatus();
 		for (uint8_t i = 0; i < 4; i++) {
 			for (uint8_t j = 0; j < 4; j++) {
-				if (j < 3 && boardVec[i][j]->canMerge(*boardVec[i][j + 1])) {
+				if (j < 3 
+					&& boardVec[i][j] != nullptr 
+					&& boardVec[i][j + 1] != nullptr 
+					&& boardVec[i][j]->canMerge(*boardVec[i][j + 1])) {
 					return true;
 				}
-				if (i < 3 && boardVec[i][j]->canMerge(*boardVec[i + 1][j])) {
+				if (i < 3 
+					&& boardVec[i][j] != nullptr 
+					&& boardVec[i + 1][j] != nullptr 
+					&& boardVec[i][j]->canMerge(*boardVec[i + 1][j])) {
 					return true;
 				}
 			}
@@ -97,6 +103,7 @@ namespace GameLogic {
 			break;
 		default:
 			break;
+			return false;
 		}
 	}
 
@@ -117,25 +124,37 @@ namespace GameLogic {
 
 	void Board::addNewTile()
 	{
+		if (canCreateTile()) {
 			uint8_t randRow, randCol;
 			do {
 				randRow = std::rand() % 4;
 				randCol = std::rand() % 4;
 			} while (this->boardVec[randRow][randCol] != nullptr);
-			this->boardVec[randRow][randCol] = new Tile(randRow*4+randCol);
+			this->boardVec[randRow][randCol] = new Tile(randRow * 4 + randCol);
+		}
+
 	}
 
+	std::vector<std::vector<Tile*>>* Board::getBoard()
+	{
+		return &boardVec;
+	}
 
-	bool Board::isGameComplete() {
-		//checks possible spots
+	bool Board::canCreateTile() {
 		for (std::vector<Tile*> v : boardVec) {
 			for (Tile* t : v) {
-				if (t != nullptr) {
-					return false;
+				if (t == nullptr) {
+					return true;
 				}
 			}
 		}
-		return !canMergeRemaining();
+		return false;  // No empty spot found
+	}
+
+	bool Board::isGameComplete() {
+		//checks possible spots
+
+		return (!canMergeRemaining() && !canCreateTile());
 	}
 
 
@@ -205,7 +224,7 @@ namespace GameLogic {
 	bool Board::moveDownLogic()
 	{
 		bool moved = false;
-		for (uint8_t i = 2; i >= 0; i--) {
+		for (int8_t i = 2; i >= 0; i--) {
 			for (uint8_t j = 0; j < 4; j++) {
 				if (boardVec[i][j] == nullptr)
 					continue;
@@ -323,7 +342,7 @@ namespace GameLogic {
 	bool Board::moveRightLogic()
 	{
 		bool moved = false;
-		for (uint8_t j = 2; j >= 0; j--) {
+		for (int8_t j = 2; j >= 0; j--) {
 			for (uint8_t i = 0; i < 4; i++) {
 				if (boardVec[i][j] == nullptr)
 					continue;

@@ -2,6 +2,7 @@
 
 
 int main(int argc, char* args[]) {
-    Game::run();
+    Game::Game G;
+    G.run();
     return 0;
 }
