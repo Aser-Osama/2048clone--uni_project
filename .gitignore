@@ -24,3 +24,11 @@ CreativeMindProject/x64/Debug/Creative.33aeda4b.tlog/link.read.1.tlog
 CreativeMindProject/x64/Debug/Creative.33aeda4b.tlog/CL.write.1.tlog
 CreativeMindProject/x64/Debug/Creative.33aeda4b.tlog/CL.read.1.tlog
 CreativeMindProject/x64/Debug/Creative.33aeda4b.tlog/CL.command.1.tlog
+*.ipch
+*.db
+.vs/CreativeMindProject/v17/.suo
+.vs/CreativeMindProject/v17/Browse.VC.db
+.vs/CreativeMindProject/v17/Browse.VC.db-shm
+.vs/CreativeMindProject/v17/Browse.VC.db-wal
+.vs/CreativeMindProject/v17/Browse.VC.opendb
+.vs/CreativeMindProject/v17/ipch/AutoPCH/1b03f4deac665c33/GAMELOGIC.ipch

@@ -30,7 +30,10 @@ namespace GameLogic
 		bool isGameComplete();
 		bool makeMove(char move);
 		void resetMergeStatus();
+		bool canMergeRemaining();
 		void printv();
+		void addNewTile();
+
 		
 		//logic for moving is split into seprate functions for ease of reading
 		bool moveUpLogic();
