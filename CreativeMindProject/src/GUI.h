@@ -1,15 +1,17 @@
 #pragma once
 #include <SDL.h>
-#include "GameLogic.h"
 namespace GUI {
-	class Game {
-	private:
-		GameLogic::Board* mBoard;
-		SDL_Window* window;
-		SDL_Surface* screenSurface;
-	public:
-		Game();
-		void run();
-
-	};
+	class GUI {
+		private:
+			SDL_Window* mWindow;
+			SDL_Surface* mScreenSurface;
+			SDL_Renderer* mRenderer;
+		public:
+			GUI(const char* pTitle, int pW, int pH);
+			SDL_Texture* loadTexture(const char* pFilePath);
+			void clear();
+			void render(SDL_Texture* pTexture);
+			void display();
+			~GUI();
+		};
 }

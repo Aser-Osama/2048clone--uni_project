@@ -1,8 +1,7 @@
-#include "src/GUI.h"
+#include "src/game.h"
 
 
 int main(int argc, char* args[]) {
-    GUI::Game mGUI;
-    mGUI.run();
+    Game::run();
     return 0;
 }

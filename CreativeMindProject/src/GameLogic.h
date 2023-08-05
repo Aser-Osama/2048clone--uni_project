@@ -5,16 +5,18 @@ namespace GameLogic
 {
 	class Tile {
 	private:
-		int tileVal;
+		uint8_t tileVal;
 		std::string tilePath;
 		bool merged = false;
+		uint8_t gridPos;
 	public:
-		Tile(int num); //Generate a given sized tile
-		Tile(); //Generate a random tile (2 or 4)
-		int getVal();
+		Tile(uint8_t size, uint8_t pos); //Generate a given sized tile
+		Tile(uint8_t pos); //Generate a random tile (2 or 4)
+		uint8_t getVal();
 		bool canMerge(Tile tile);
 		void doubleVal();
 		void resetMergeStatus();
+		void setPos(uint8_t, uint8_t);
 	};
 
 	class Board {

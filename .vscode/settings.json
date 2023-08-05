@@ -46,6 +46,8 @@
         "algorithm": "cpp",
         "array": "cpp",
         "random": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "map": "cpp",
+        "xtree": "cpp"
     }
 }
