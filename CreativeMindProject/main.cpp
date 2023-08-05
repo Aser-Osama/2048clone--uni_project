@@ -2,7 +2,7 @@
 #include <array>
 #include <random>
 #include "src/GameLogic.h"
-
+#include <iostream>
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define GRID_SIZE 4
@@ -115,9 +115,31 @@ int main(int argc, char* args[]) {
     //Game game;
     //game.run();
     //return 0;
-    GameLogic::test();
-    GameLogic::testc t;
-    t.test();
+    GameLogic::Board b;
+    b.printv();
+    
+    std::cout << "\n--m1 l--\n";
+    std::cout << b.makeMove('l') << std::endl;
+    b.printv();
 
+    std::cout << "\n--m2 l--\n";
+    std::cout << b.makeMove('l') << std::endl;
+    b.printv();
+
+    std::cout << "\n-m3 l--\n";
+    std::cout << b.makeMove('u') << std::endl;
+    b.printv();
+
+    std::cout << "\n-m4 u--\n";
+    std::cout << b.makeMove('u') << std::endl;
+    b.printv();
+
+    std::cout << "\n-m5 l--\n";
+    std::cout << b.makeMove('l') << std::endl;
+    b.printv();
+
+    std::cout << "\n-m6 u--\n";
+    std::cout << b.makeMove('u') << std::endl;
+    b.printv();
     return 0;
 }

@@ -7,11 +7,14 @@ namespace GameLogic
 	private:
 		int tileVal;
 		std::string tilePath;
+		bool merged = false;
 	public:
 		Tile(int num); //Generate a given sized tile
 		Tile(); //Generate a random tile (2 or 4)
 		int getVal();
 		bool canMerge(Tile tile);
+		void doubleVal();
+		void resetMergeStatus();
 	};
 
 	class Board {
@@ -25,7 +28,15 @@ namespace GameLogic
 	public:
 		Board();
 		bool isGameComplete();
-		bool isMoveLegal(char move);
+		bool makeMove(char move);
+		void resetMergeStatus();
+		void printv();
+		
+		//logic for moving is split into seprate functions for ease of reading
+		bool moveUpLogic();
+		bool moveDownLogic();
+		bool moveRightLogic();
+		bool moveLeftLogic();
 	};
 
 
