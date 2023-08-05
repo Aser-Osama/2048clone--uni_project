@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <array>
 #include <random>
+#include "src/GameLogic.h"
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
@@ -111,7 +112,12 @@ public:
 };
 
 int main(int argc, char* args[]) {
-    Game game;
-    game.run();
+    //Game game;
+    //game.run();
+    //return 0;
+    GameLogic::test();
+    GameLogic::testc t;
+    t.test();
+
     return 0;
 }

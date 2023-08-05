@@ -1,2 +1,9 @@
-﻿  main.cpp
+﻿  GameLogic.cpp
+  main.cpp
+C:\Users\asero\source\repos\CreativeMindProject\CreativeMindProject\main.cpp(42,1): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+  Generating Code...
   CreativeMindProject.vcxproj -> C:\Users\asero\source\repos\CreativeMindProject\x64\Debug\CreativeMindProject.exe
