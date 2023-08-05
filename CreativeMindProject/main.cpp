@@ -1,123 +1,117 @@
-
-/*This source code copyrighted by Lazy Foo' Productions 2004-2023
-and may not be redistributed without written permission.*/
-
-//Using SDL and standard IO
 #include <SDL.h>
-#include <stdio.h>
-#include <iostream>
+#include <array>
+#include <random>
 
-//Screen dimension constants
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 720;
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+#define GRID_SIZE 4
+ 
+//test
 
-int main(int argc, char* args[])
-{
-	//The window we'll be rendering to
-	SDL_Window* window = NULL;
+class Board {
+public:
+    std::array<std::array<int, GRID_SIZE>, GRID_SIZE> grid;
 
-	//The surface contained by the window
-	SDL_Surface* screenSurface = NULL;
+    Board() {
+        for(int i = 0; i < GRID_SIZE; i++) {
+            for(int j = 0; j < GRID_SIZE; j++) {
+                grid[i][j] = 0;
+            }
+        }
 
-	
-	
-	//Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
-		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-	}
-	else
-	{
-		//Create window
-		window = SDL_CreateWindow("2048 Clone", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-		if (window == NULL)
-		{
-			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-		}
-		else
-		{
-			//Get window surface
-			screenSurface = SDL_GetWindowSurface(window);
+        // Add an initial tile
+        addRandomTile();
+    }
 
-			//Creating and loading an image
-			SDL_Surface* imgSurface = NULL;
-			//for vscode:
-			imgSurface = SDL_LoadBMP("CreativeMindProject\\Imgs\\Tile_1.bmp");
-			//for vs:
-			//imgSurface = SDL_LoadBMP("Imgs\\Tile_1.bmp");
-			
-			
+    void addRandomTile() {
+        std::vector<std::pair<int, int>> emptyCells;
 
-			if (imgSurface == NULL) {
-				printf("Image could not be Loaded! SDL_Error: %s\n", SDL_GetError());
-				return 1;
-			}
+        // Find all empty cells
+        for(int i = 0; i < GRID_SIZE; i++) {
+            for(int j = 0; j < GRID_SIZE; j++) {
+                if(grid[i][j] == 0) {
+                    emptyCells.push_back(std::make_pair(i, j));
+                }
+            }
+        }
 
-			//Fill the surface white
-			SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+        // Choose a random cell
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distrib(0, emptyCells.size() - 1);
 
-			//Update the surface
-			SDL_UpdateWindowSurface(window);
+        int randomCellIndex = distrib(gen);
+        std::pair<int, int> randomCell = emptyCells[randomCellIndex];
 
-			//Hack to get window to stay up
-			SDL_Event e;
-			bool quit = false;
-			SDL_Rect r{20,20,50,50};
-			while (quit == false)
-			{
-				while (SDL_PollEvent(&e))
-				{
-					if (e.type == SDL_QUIT){
+        // Set the cell to 2 or 4
+        grid[randomCell.first][randomCell.second] = (gen() % 2 + 1) * 2;
+    }
 
-						quit = true; 
-					}
+    // Other board methods will go here
+};
 
-					else if (e.type == SDL_KEYDOWN)
-					{
-						switch (e.key.keysym.sym)
-						{
-						case SDLK_UP:
-							std::cout << "Up was pressed";
-							r.y -=50; 
-							break;
-						case SDLK_DOWN:
-							std::cout << "Down was pressed";
-							r.y +=50; 
+class Game {
+public:
+    SDL_Window* window;
+    SDL_Surface* screenSurface;
+    Board* board;
 
-							break;
-						case SDLK_RIGHT:
-						
-							std::cout << "Right was pressed";
-							r.x +=50; 
+    Game() {
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+            printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+        } else {
+            window = SDL_CreateWindow("2048 Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+            if (window == NULL) {
+                printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+            } else {
+                screenSurface = SDL_GetWindowSurface(window);
+                board = new Board();
+            }
+        }
+    }
 
-							break;
-						case SDLK_LEFT:
-							std::cout << "Left was pressed";
-							r.x -=50; 
+    void run() {
+        bool quit = false;
+        SDL_Event e;
+        while (!quit) {
+            while (SDL_PollEvent(&e) != 0) {
+                // User requests quit
+                if (e.type == SDL_QUIT) {
+                    quit = true;
+                }
+                // User presses a key
+                else if (e.type == SDL_KEYDOWN) {
+                    switch (e.key.keysym.sym) {
+                        case SDLK_UP:
+                            // Move tiles up
+                            break;
+                        case SDLK_DOWN:
+                            // Move tiles down
+                            break;
+                        case SDLK_LEFT:
+                            // Move tiles left
+                            break;
+                        case SDLK_RIGHT:
+                            // Move tiles right
+                            break;
+                    }
+                }
+            }
 
-							break;							
-						default:
-							break;
-						}
-					}
-				}
-				SDL_BlitSurface(imgSurface, &r, screenSurface, NULL);
-				SDL_UpdateWindowSurface(window);
-				SDL_UpdateWindowSurfaceRects(window, &r, 1);
-			}
-			SDL_FreeSurface(imgSurface);
-			SDL_FreeSurface(screenSurface);
+            // Render the game state here
 
-			imgSurface = NULL;
-			screenSurface = NULL;
-		}
-	}
+            // Update the window surface
+            SDL_UpdateWindowSurface(window);
+        }
 
-	//Destroy window
-	SDL_DestroyWindow(window);
+        // Cleanup
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+    }
+};
 
-	//Quit SDL subsystems
-	SDL_Quit();
-
-	return 0;
+int main(int argc, char* args[]) {
+    Game game;
+    game.run();
+    return 0;
 }
