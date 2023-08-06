@@ -47,7 +47,7 @@ namespace GUI {
 		dst.x = x;
 		dst.y = y;
 		src.w = dst.w = TILE_W;
-		src.h = dst.h =TILE_H;
+		src.h = dst.h = TILE_H;
 		SDL_RenderCopy(mRenderer, pTexture, &src, &dst);
 	}
 

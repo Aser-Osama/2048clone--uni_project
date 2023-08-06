@@ -40,6 +40,7 @@ namespace GameLogic {
 				randCol = std::rand() % 4;
 			} while (this->boardVec[randRow][randCol] != nullptr);
 			this->boardVec[randRow][randCol] = new Tile(randRow * 4 + randCol);
+			vCap++;
 		}
 	}
 
@@ -75,9 +76,10 @@ namespace GameLogic {
 	}
 
 	void Board::makeMove(char move) {
-		if (GeneralMoveLogic(move))
+		if (GeneralMoveLogic(move)){
 			this->addNewTile();
-		this->resetMergeStatus();
+			this->resetMergeStatus();
+		}
 	}
 
 
@@ -98,6 +100,7 @@ namespace GameLogic {
 	void Board::addNewTile()
 	{
 		if (canCreateTile()) {
+			vCap++;
 			uint8_t randRow, randCol;
 			do {
 				randRow = std::rand() % 4;
@@ -114,14 +117,14 @@ namespace GameLogic {
 	}
 
 	bool Board::canCreateTile() {
-		for (std::vector<Tile*> v : boardVec) {
-			for (Tile* t : v) {
-				if (t == nullptr) {
-					return true;
-				}
-			}
-		}
-		return false;  // No empty spot found
+			// for (std::vector<Tile*> v : boardVec) {
+			// 		for (Tile* t : v) {
+			// 			if (t == nullptr) {
+			// 				return true;
+			// 			}
+			// 	}
+			// }
+		return !(vCap==16);  // No empty spot found
 	}
 
 	bool Board::isGameComplete() {
@@ -156,6 +159,7 @@ namespace GameLogic {
 								boardVec[k + dI][j]->doubleVal();
 								delete boardVec[i][j];
 								boardVec[k][j] = nullptr;
+								vCap--;
 							}
 						}
 					}
@@ -167,6 +171,7 @@ namespace GameLogic {
 						boardVec[i + dI][j]->doubleVal();
 						delete boardVec[i][j];
 						boardVec[i][j] = nullptr;
+						vCap--;
 						for (uint8_t k = i + dI; up ? k > 0 : k < 3; k += dI) { //to move up as far as possible
 							if (boardVec[k][j] == nullptr)
 								continue;
@@ -179,6 +184,7 @@ namespace GameLogic {
 								boardVec[k + dI][j]->doubleVal();
 								delete boardVec[k][j];
 								boardVec[k][j] = nullptr;
+								vCap--;
 							}
 						}
 					}
@@ -207,6 +213,7 @@ namespace GameLogic {
 							}
 							else if (boardVec[i][k]->canMerge(*boardVec[i][k + dJ])) { //left tile is mergable
 								boardVec[i][k + dJ]->doubleVal();
+								vCap--;
 								delete boardVec[i][k];
 								boardVec[i][k] = nullptr;
 							}
@@ -220,6 +227,7 @@ namespace GameLogic {
 						boardVec[i][j + dJ]->doubleVal();
 						delete boardVec[i][j];
 						boardVec[i][j] = nullptr;
+						vCap--;
 						for (int8_t k = j + dJ; Left ? k > 0: k < 3; k += dJ) {
 							if (boardVec[k][j] == nullptr)
 								continue;
@@ -232,6 +240,7 @@ namespace GameLogic {
 								boardVec[i][k]->doubleVal();
 								delete boardVec[i][k];
 								boardVec[i][k] = nullptr;
+								vCap--;
 							}
 						}
 					}

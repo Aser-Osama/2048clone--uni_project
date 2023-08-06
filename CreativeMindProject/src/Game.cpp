@@ -39,11 +39,9 @@ namespace Game {
                         break;
                     case SDLK_LEFT:
                         board.makeMove('l');
-                            board.addNewTile();
                         break;
                     case SDLK_RIGHT:
                         board.makeMove('r');
-                            board.addNewTile();
                         break;
                     default:
                         break;
@@ -60,9 +58,6 @@ namespace Game {
                     GameLogic::Tile* t = (*boardVec)[i][j];
                     if (t) {
                         gGUI->renderTile(t->getVal(), i, j);
-                    }
-                    else {
-                        continue;
                     }
                 }
             }

@@ -23,7 +23,7 @@ namespace GameLogic
 												{nullptr, nullptr, nullptr, nullptr},
 												{nullptr, nullptr, nullptr, nullptr},
 												{nullptr, nullptr, nullptr, nullptr}};
-
+		uint8_t vCap = 0;
 	public:
 		Board();
 		bool isGameComplete();
