@@ -9,7 +9,7 @@ namespace Game
 		void init();
 		void run();
 	private:
-		GUI::GUI* gui;
+		GUI::gameGUI* gGUI;
 		GameLogic::Board board;
 	};
 

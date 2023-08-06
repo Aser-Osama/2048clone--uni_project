@@ -6,13 +6,6 @@
 #pragma once
 
 namespace GameLogic {
-
-	//Tile class definitions
-	Tile::Tile(uint8_t num, uint8_t pos) { //never used
-		tileVal = num;
-		gridPos = pos;
-		tilePath = "CreativeMindProject\\Imgs\\ (" + std::to_string(num) + ").bmp";
-	}
 	Tile::Tile(uint8_t pos) {
 		gridPos = pos;
 		int rand = std::rand() % 11;
@@ -36,21 +29,18 @@ namespace GameLogic {
 	void Tile::resetMergeStatus() {
 		merged = false;
 	}
-	void Tile::setPos(uint8_t i, uint8_t j){
-		this->gridPos = i * 4 + j;
-	}
 
 	//Board class definitions
 	Board::Board() {
-		 std::srand(std::time(0));
-		 for (uint8_t i = 0; i < 2; i++) {
-		 	uint8_t randRow, randCol;
-		 	do {
-		 		randRow = std::rand() % 4;
-		 		randCol = std::rand() % 4;
-		 	} while (this->boardVec[randRow][randCol] != nullptr);
-		 	this->boardVec[randRow][randCol] = new Tile(randRow * 4 + randCol);
-		 }
+		std::srand(std::time(0));
+		for (uint8_t i = 0; i < 2; i++) {
+			uint8_t randRow, randCol;
+			do {
+				randRow = std::rand() % 4;
+				randCol = std::rand() % 4;
+			} while (this->boardVec[randRow][randCol] != nullptr);
+			this->boardVec[randRow][randCol] = new Tile(randRow * 4 + randCol);
+		}
 	}
 
 	void Board::resetMergeStatus() {
@@ -65,18 +55,17 @@ namespace GameLogic {
 
 	bool Board::canMergeRemaining()
 	{
-		this->resetMergeStatus();
 		for (uint8_t i = 0; i < 4; i++) {
 			for (uint8_t j = 0; j < 4; j++) {
-				if (j < 3 
-					&& boardVec[i][j] != nullptr 
-					&& boardVec[i][j + 1] != nullptr 
+				if (j < 3
+					&& boardVec[i][j] != nullptr
+					&& boardVec[i][j + 1] != nullptr
 					&& boardVec[i][j]->canMerge(*boardVec[i][j + 1])) {
 					return true;
 				}
-				if (i < 3 
-					&& boardVec[i][j] != nullptr 
-					&& boardVec[i + 1][j] != nullptr 
+				if (i < 3
+					&& boardVec[i][j] != nullptr
+					&& boardVec[i + 1][j] != nullptr
 					&& boardVec[i][j]->canMerge(*boardVec[i + 1][j])) {
 					return true;
 				}
@@ -85,26 +74,10 @@ namespace GameLogic {
 		return false;
 	}
 
-	bool Board::makeMove(char move) {
+	void Board::makeMove(char move) {
+		if (GeneralMoveLogic(move))
+			this->addNewTile();
 		this->resetMergeStatus();
-		switch (move) {
-		case 'u': //checks if i can push all rows up
-			return moveUpLogic();
-			break;
-		case 'd': //checks if i can push all columns down
-			return moveDownLogic();
-			break;
-
-		case 'l':
-			return moveLeftLogic();
-			break;
-		case 'r':
-			return moveRightLogic();
-			break;
-		default:
-			break;
-			return false;
-		}
 	}
 
 
@@ -113,7 +86,7 @@ namespace GameLogic {
 		for (uint8_t i = 0; i < boardVec.size(); i++) {
 			for (uint8_t j = 0; j < boardVec.size(); j++) {
 				if (boardVec[i][j])
-					std::cout << boardVec[i][j]->getVal(); 
+					std::cout << boardVec[i][j]->getVal();
 				else
 					std::cout << 0;
 				std::cout << "\t";
@@ -152,246 +125,120 @@ namespace GameLogic {
 	}
 
 	bool Board::isGameComplete() {
-		//checks possible spots
-
-		return (!canMergeRemaining() && !canCreateTile());
+		return !(canCreateTile() || canMergeRemaining());
 	}
 
 
-
-	//will reduce code duplication later on
-	bool Board::moveUpLogic()
+	bool Board::GeneralMoveLogic(char dir)
 	{
+		bool vertical = (dir == 'u' || dir == 'd');
 		bool moved = false;
-		for (uint8_t i = 1; i < 4; i++) {
-			for (uint8_t j = 0; j < 4; j++) {
-				if (boardVec[i][j] == nullptr)
-					continue;
+		if (vertical) {
+			int dI = (dir == 'u') ? -1 : 1;
+			bool up = (dir == 'u');
+			for (int i = up ? 1 : 2; up ? i < 4 : i >= 0; i += -(dI)) {
+				for (int j = 0; j < 4; j++) {
+					if (boardVec[i][j] == nullptr)
+						continue;
+					if (boardVec[i + dI][j] == nullptr) { //above tile is empty
+						boardVec[i + dI][j] = boardVec[i][j];
+						boardVec[i][j] = nullptr;
+						moved = true;
+						for (uint8_t k = i + dI; up ? k > 0 : k < 3; k += dI) { //to move up as far as possible
+							if (boardVec[k][j] == nullptr)
+								continue;
 
-				if (boardVec[i - 1][j] == nullptr) { //above tile is empty
-					boardVec[i - 1][j] = boardVec[i][j];
-					boardVec[i - 1][j]->setPos(i - 1, j);
-					boardVec[i][j] = nullptr;
-					moved = true;
-					for (uint8_t k = i - 1; k > 0; k--) { //to move up as far as possible
-						if (boardVec[k][j] == nullptr)
-							continue;
-
-						if (boardVec[k - 1][j] == nullptr) { //above tile is also empty
-							boardVec[k - 1][j] = boardVec[k][j];
-							boardVec[k - 1][j]->setPos(k - 1, j);
-							boardVec[k][j] = nullptr;
-						}
-						else if (boardVec[k][j]->canMerge(*boardVec[k - 1][j])) { //above tile is mergable
-							boardVec[k - 1][j]->doubleVal();
-							boardVec[k - 1][j]->setPos(k - 1, j);
-
-							delete boardVec[i][j];
-							boardVec[k][j] = nullptr;
+							if (boardVec[k + dI][j] == nullptr) { //above tile is also empty
+								boardVec[k + dI][j] = boardVec[k][j];
+								boardVec[k][j] = nullptr;
+							}
+							else if (boardVec[k][j]->canMerge(*boardVec[k + dI][j])) { //above tile is mergable
+								boardVec[k + dI][j]->doubleVal();
+								delete boardVec[i][j];
+								boardVec[k][j] = nullptr;
+							}
 						}
 					}
-				}
 
-				//////////
+					//////////
 
-				else if (boardVec[i][j]->canMerge(*boardVec[i - 1][j])) { //above tile is mergable
-					moved = true;
-					boardVec[i - 1][j]->doubleVal();
-					boardVec[i - 1][j]->setPos(i - 1, j);
-					delete boardVec[i][j];
-					boardVec[i][j] = nullptr;
-					for (uint8_t k = i - 1; k > 0; k--) {
-						if (boardVec[k][j] == nullptr)
-							continue;
+					else if (boardVec[i][j]->canMerge(*boardVec[i + dI][j])) { //above tile is mergable
+						moved = true;
+						boardVec[i + dI][j]->doubleVal();
+						delete boardVec[i][j];
+						boardVec[i][j] = nullptr;
+						for (uint8_t k = i + dI; up ? k > 0 : k < 3; k += dI) { //to move up as far as possible
+							if (boardVec[k][j] == nullptr)
+								continue;
 
-						if (boardVec[k - 1][j] == nullptr) { //above tile is empty
-							boardVec[k - 1][j] = boardVec[k][j];
-							boardVec[k - 1][j]->setPos(k - 1, j);
-							boardVec[k][j] = nullptr;
-						}
-						else if (boardVec[k][j]->canMerge(*boardVec[k - 1][j])) { //above tile is also mergable
-							boardVec[k - 1][j]->doubleVal();
-							boardVec[k - 1][j]->setPos(k - 1, j);
-							delete boardVec[k][j];
-							boardVec[k][j] = nullptr;
+							if (boardVec[k + dI][j] == nullptr) { //above tile is empty
+								boardVec[k + dI][j] = boardVec[k][j];
+								boardVec[k][j] = nullptr;
+							}
+							else if (boardVec[k][j]->canMerge(*boardVec[k + dI][j])) { //above tile is also mergable
+								boardVec[k + dI][j]->doubleVal();
+								delete boardVec[k][j];
+								boardVec[k][j] = nullptr;
+							}
 						}
 					}
 				}
 			}
 		}
-		return moved;
-	}
-	bool Board::moveDownLogic()
-	{
-		bool moved = false;
-		for (int8_t i = 2; i >= 0; i--) {
-			for (uint8_t j = 0; j < 4; j++) {
-				if (boardVec[i][j] == nullptr)
-					continue;
+		else {
+			int dJ = (dir == 'l') ? -1 : 1;
+			bool Left = (dir == 'l');
+			for (int8_t i = 0; i < 4; i++) {
+				for (int8_t j = Left ? 1 : 2; Left ? j < 4 : j >= 0; j += (-dJ)) {
+					if (boardVec[i][j] == nullptr)
+						continue;
 
-				if (boardVec[i + 1][j] == nullptr) { //below tile is empty
-					boardVec[i + 1][j] = boardVec[i][j];
-					boardVec[i + 1][j]->setPos(i + 1, j);
-					boardVec[i][j] = nullptr;
-					moved = true;
-					for (uint8_t k = i + 1; k < 3; k++) { //to move down as far as possible
-						if (boardVec[k][j] == nullptr)
-							continue;
+					if (boardVec[i][j + dJ] == nullptr) { //left tile is empty
+						boardVec[i][j + dJ] = boardVec[i][j];
+						boardVec[i][j] = nullptr;
+						moved = true;
+						for (int8_t k = j + dJ; Left ? k > 0: k < 3; k += dJ) { //to move left as far as possible
+							if (boardVec[i][k] == nullptr)
+								continue;
 
-						if (boardVec[k + 1][j] == nullptr) { //below tile is also empty
-							boardVec[k + 1][j] = boardVec[k][j];
-							boardVec[k + 1][j]->setPos(k + 1, j);
-
-							boardVec[k][j] = nullptr;
-						}
-						else if (boardVec[k][j]->canMerge(*boardVec[k + 1][j])) { //below tile is mergeable
-							boardVec[k + 1][j]->doubleVal();
-							boardVec[k + 1][j]->setPos(k + 1, j);
-
-							delete boardVec[i][j];
-							boardVec[k][j] = nullptr;
+							if (boardVec[i][k + dJ] == nullptr) { //left tile is also empty
+								boardVec[i][k + dJ] = boardVec[i][k];
+								boardVec[i][k] = nullptr;
+							}
+							else if (boardVec[i][k]->canMerge(*boardVec[i][k + dJ])) { //left tile is mergable
+								boardVec[i][k + dJ]->doubleVal();
+								delete boardVec[i][k];
+								boardVec[i][k] = nullptr;
+							}
 						}
 					}
-				}
 
-				//////////
+					//////////
 
-				else if (boardVec[i][j]->canMerge(*boardVec[i + 1][j])) { //below tile is mergeable
-					moved = true;
-					boardVec[i + 1][j]->doubleVal();
-					boardVec[i + 1][j]->setPos(i + 1, j);
-					delete boardVec[i][j];
-					boardVec[i][j] = nullptr;
-					for (uint8_t k = i + 1; k < 3; k++) {
-						if (boardVec[k][j] == nullptr)
-							continue;
+					else if (boardVec[i][j]->canMerge(*boardVec[i][j + dJ])) { //above tile is mergable
+						moved = true;
+						boardVec[i][j + dJ]->doubleVal();
+						delete boardVec[i][j];
+						boardVec[i][j] = nullptr;
+						for (int8_t k = j + dJ; Left ? k > 0: k < 3; k += dJ) {
+							if (boardVec[k][j] == nullptr)
+								continue;
 
-						if (boardVec[k + 1][j] == nullptr) { //below tile is empty
-							boardVec[k + 1][j] = boardVec[k][j];
-							boardVec[k + 1][j]->setPos(k + 1, j);
-
-							boardVec[k][j] = nullptr;
-						}
-						else if (boardVec[k][j]->canMerge(*boardVec[k + 1][j])) { //below tile is also mergeable
-							boardVec[k + 1][j]->doubleVal();
-							boardVec[k + 1][j]->setPos(k + 1, j);
-
-							delete boardVec[k][j];
-							boardVec[k][j] = nullptr;
+							if (boardVec[i][k + dJ] == nullptr) { //above tile is empty
+								boardVec[i][k + dJ] = boardVec[i][k];
+								boardVec[i][k] = nullptr;
+							}
+							else if (boardVec[i][k]->canMerge(*boardVec[i][k + dJ])) { //above tile is also mergable
+								boardVec[i][k]->doubleVal();
+								delete boardVec[i][k];
+								boardVec[i][k] = nullptr;
+							}
 						}
 					}
 				}
 			}
 		}
+
 		return moved;
 	}
-	bool Board::moveLeftLogic()
-	{
-		bool moved = false;
-		for (uint8_t i = 0; i < 4; i++) {
-			for (uint8_t j = 1; j < 4; j++) {
-				if (boardVec[i][j] == nullptr)
-					continue;
-
-				if (boardVec[i][j-1] == nullptr) { //left tile is empty
-					boardVec[i][j-1] = boardVec[i][j];
-					boardVec[i][j] = nullptr;
-					moved = true;
-					for (uint8_t k = j - 1; k > 0; k--) { //to move left as far as possible
-						if (boardVec[i][k] == nullptr)
-							continue;
-
-						if (boardVec[i][k-1] == nullptr) { //left tile is also empty
-							boardVec[i][k-1] = boardVec[i][k];
-							boardVec[i][k] = nullptr;
-						}
-						else if (boardVec[i][k]->canMerge(*boardVec[i][k-1])) { //left tile is mergable
-							boardVec[i][k-1]->doubleVal();
-							delete boardVec[i][k];
-							boardVec[i][k] = nullptr;
-						}
-					}
-				}
-
-				//////////
-
-				else if (boardVec[i][j]->canMerge(*boardVec[i][j-1])) { //above tile is mergable
-					moved = true;
-					boardVec[i][j-1]->doubleVal();
-					delete boardVec[i][j];
-					boardVec[i][j] = nullptr;
-					for (uint8_t k = j - 1; k > 0; k--) {
-						if (boardVec[k][j] == nullptr)
-							continue;
-
-						if (boardVec[i][k-1] == nullptr) { //above tile is empty
-							boardVec[i][k-1] = boardVec[i][k];
-							boardVec[i][k] = nullptr;
-						}
-						else if (boardVec[i][k]->canMerge(*boardVec[i][k-1])) { //above tile is also mergable
-							boardVec[i][k]->doubleVal();
-							delete boardVec[i][k];
-							boardVec[i][k] = nullptr;
-						}
-					}
-				}
-			}
-		}
-		return moved;
-	}
-	bool Board::moveRightLogic()
-	{
-		bool moved = false;
-		for (int8_t j = 2; j >= 0; j--) {
-			for (uint8_t i = 0; i < 4; i++) {
-				if (boardVec[i][j] == nullptr)
-					continue;
-
-				if (boardVec[i][j + 1] == nullptr) { // right tile is empty
-					boardVec[i][j + 1] = boardVec[i][j];
-					boardVec[i][j] = nullptr;
-					moved = true;
-					for (uint8_t k = j + 1; k < 3; k++) { // to move right as far as possible
-						if (boardVec[i][k] == nullptr)
-							continue;
-
-						if (boardVec[i][k + 1] == nullptr) { // right tile is also empty
-							boardVec[i][k + 1] = boardVec[i][k];
-							boardVec[i][k] = nullptr;
-						}
-						else if (boardVec[i][k]->canMerge(*boardVec[i][k + 1])) { // right tile is mergeable
-							boardVec[i][k + 1]->doubleVal();
-							delete boardVec[i][k];
-							boardVec[i][k] = nullptr;
-						}
-					}
-				}
-
-				//////////
-
-				else if (boardVec[i][j]->canMerge(*boardVec[i][j + 1])) { // right tile is mergeable
-					moved = true;
-					boardVec[i][j + 1]->doubleVal();
-					delete boardVec[i][j];
-					boardVec[i][j] = nullptr;
-					for (uint8_t k = j + 1; k < 3; k++) {
-						if (boardVec[i][k] == nullptr)
-							continue;
-
-						if (boardVec[i][k + 1] == nullptr) { // right tile is empty
-							boardVec[i][k + 1] = boardVec[i][k];
-							boardVec[i][k] = nullptr;
-						}
-						else if (boardVec[i][k]->canMerge(*boardVec[i][k + 1])) { // right tile is also mergeable
-							boardVec[i][k + 1]->doubleVal();
-							delete boardVec[i][k];
-							boardVec[i][k] = nullptr;
-						}
-					}
-				}
-			}
-		}
-		return moved;
-	}
-}
-
+};

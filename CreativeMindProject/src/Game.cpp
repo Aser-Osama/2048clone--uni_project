@@ -11,8 +11,8 @@ namespace Game {
 		if (SDL_Init(SDL_INIT_VIDEO) > 0) {
 			std::cout << "SDL_Init failed" << SDL_GetError() << std::endl;
 		}
-		gui = new GUI::GUI("2048 CLONE", 1280, 720);
-		gui->loadTextures();
+		gGUI = new GUI::gameGUI("2048 CLONE", 1280, 720);
+		gGUI->loadTextures();
 	}
 
     void Game::run() {
@@ -32,24 +32,18 @@ namespace Game {
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
                     case SDLK_UP:
-                        if (board.makeMove('u'))
-                            board.addNewTile();
-
+                        board.makeMove('u');
                         break;
                     case SDLK_DOWN:
-                        if(board.makeMove('d'))
-                            board.addNewTile();
-
+                        board.makeMove('d');
                         break;
                     case SDLK_LEFT:
-                        if(board.makeMove('l'))
+                        board.makeMove('l');
                             board.addNewTile();
-
                         break;
                     case SDLK_RIGHT:
-                        if(board.makeMove('r'))
+                        board.makeMove('r');
                             board.addNewTile();
-
                         break;
                     default:
                         break;
@@ -59,22 +53,20 @@ namespace Game {
                     break;
                 }
             }
-
-            gui->clear();
+            gGUI->clear();
             std::vector<std::vector<GameLogic::Tile*>>* boardVec = board.getBoard();
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
                     GameLogic::Tile* t = (*boardVec)[i][j];
-                    if (t != NULL) {
-                        gui->renderTile(t->getVal(), i, j);
+                    if (t) {
+                        gGUI->renderTile(t->getVal(), i, j);
                     }
                     else {
                         continue;
                     }
                 }
             }
-            gui->display();
-            
+            gGUI->display();
         }
     }
 };
