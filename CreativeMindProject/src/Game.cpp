@@ -53,6 +53,7 @@ namespace Game {
             }
             gGUI->clear();
             std::vector<std::vector<GameLogic::Tile*>>* boardVec = board.getBoard();
+            gGUI->renderBG();
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
                     GameLogic::Tile* t = (*boardVec)[i][j];
