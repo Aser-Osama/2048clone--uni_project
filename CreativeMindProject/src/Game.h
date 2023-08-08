@@ -5,12 +5,12 @@
 namespace Game
 {
 	class Game {
-	public:
-		void init();
-		void run();
 	private:
 		GUI::gameGUI* gGUI;
 		GameLogic::Board board;
+		void init();
+	public:
+		void run();
 	};
 
 
