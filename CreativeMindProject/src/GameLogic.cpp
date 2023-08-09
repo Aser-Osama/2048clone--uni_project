@@ -111,9 +111,9 @@ namespace GameLogic {
 
 	}
 
-	std::vector<std::vector<Tile*>>* Board::getBoard()
+	std::vector<std::vector<Tile*>>& Board::getBoard()
 	{
-		return &boardVec;
+		return boardVec;
 	}
 
 	bool Board::canCreateTile() {

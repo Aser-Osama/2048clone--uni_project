@@ -33,7 +33,7 @@ namespace GameLogic
 		void printv(); //used for debugging along with gui
 		void addNewTile();
 		bool canCreateTile();
-		std::vector<std::vector<Tile*>>* getBoard();
+		std::vector<std::vector<Tile*>>& getBoard();
 		bool GeneralMoveLogic(char);
 	};
 

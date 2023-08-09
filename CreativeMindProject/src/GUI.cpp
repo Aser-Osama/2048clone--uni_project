@@ -76,12 +76,23 @@ namespace GUI {
 
 	}
 
-	void gameGUI::renderTile(int val, int iI, int jI) {
-		if (val != -1) {
-			int x = (jI)*TILE_W + 50 + (jI *4);
-			int y = (iI)*TILE_H + (iI * 4);
-			this->render(textureMap[val], x, y, TILE_H, TILE_W);
+	void gameGUI::renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec) {
+		this->renderBG();
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				GameLogic::Tile* t = (boardVec)[i][j];
+				if (t) {
+					int val = t->getVal();
+					if (val != -1) {
+
+						int x = (j)*TILE_W + 50 + (j * 4);
+						int y = (i)*TILE_H + (i * 4);
+						this->render(textureMap[val], x, y, TILE_H, TILE_W);
+					}
+				}
+			}
 		}
+
 	}
 	void gameGUI::renderBG() {
 		this->render(bgImg, NULL, NULL, NULL, NULL);
