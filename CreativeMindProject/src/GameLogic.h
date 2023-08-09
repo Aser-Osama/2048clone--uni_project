@@ -16,6 +16,10 @@ namespace GameLogic
 		void resetMergeStatus();
 	};
 
+	enum class Direction {
+		none, up, down, left, right
+	};
+
 	class Board {
 	private:
 		std::vector<std::vector<Tile*>> boardVec =	{ 
@@ -27,16 +31,16 @@ namespace GameLogic
 	public:
 		Board();
 		bool isGameComplete();
-		void makeMove(char move);
+		void makeMove(Direction d);
 		void resetMergeStatus();
 		bool canMergeRemaining();
 		void printv(); //used for debugging along with gui
 		void addNewTile();
 		bool canCreateTile();
 		std::vector<std::vector<Tile*>>& getBoard();
-		bool GeneralMoveLogic(char);
-	};
+		bool GeneralMoveLogic(Direction );
 
+	};
 
 };
 

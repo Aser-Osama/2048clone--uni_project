@@ -75,8 +75,8 @@ namespace GameLogic {
 		return false;
 	}
 
-	void Board::makeMove(char move) {
-		if (GeneralMoveLogic(move)){
+	void Board::makeMove(Direction d) {
+		if (GeneralMoveLogic(d)){
 			this->addNewTile();
 			this->resetMergeStatus();
 		}
@@ -132,13 +132,13 @@ namespace GameLogic {
 	}
 
 
-	bool Board::GeneralMoveLogic(char dir)
+	bool Board::GeneralMoveLogic(Direction dir)
 	{
-		bool vertical = (dir == 'u' || dir == 'd');
+		bool vertical = (dir == Direction::up || dir == Direction::down);
 		bool moved = false;
 		if (vertical) {
-			int dI = (dir == 'u') ? -1 : 1;
-			bool up = (dir == 'u');
+			int dI = (dir == Direction::up) ? -1 : 1;
+			bool up = (dir == Direction::up);
 			for (int i = up ? 1 : 2; up ? i < 4 : i >= 0; i += -(dI)) {
 				for (int j = 0; j < 4; j++) {
 					if (boardVec[i][j] == nullptr)
@@ -192,8 +192,8 @@ namespace GameLogic {
 			}
 		}
 		else {
-			int dJ = (dir == 'l') ? -1 : 1;
-			bool Left = (dir == 'l');
+			int dJ = (dir == Direction::left) ? -1 : 1;
+			bool Left = (dir == Direction::left);
 			for (int8_t i = 0; i < 4; i++) {
 				for (int8_t j = Left ? 1 : 2; Left ? j < 4 : j >= 0; j += (-dJ)) {
 					if (boardVec[i][j] == nullptr)
