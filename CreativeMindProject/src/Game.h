@@ -6,11 +6,11 @@ namespace Game
 {
 	class Game {
 	private:
-		GUI::gameGUI* gGUI;
-		void init();
+		GUI::gameGUI gGUI;
 		GameLogic::Board board;
 		GameLogic::Direction keyEvent(SDL_Event& E);
 	public:
+		Game();
 		void run();
 	};
 

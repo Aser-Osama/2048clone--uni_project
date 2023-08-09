@@ -5,16 +5,16 @@
 #include "GameLogic.h"
 #include <vector>
 #include <map>
-namespace Game {
+namespace Game { 
+    Game::Game() : gGUI("2048 CLONE", 1280, 720)
+    {
+        if (SDL_Init(SDL_INIT_VIDEO) > 0) {
+            std::cout << "SDL_Init failed" << SDL_GetError() << std::endl;
+            exit(1);
+        }
+        gGUI.loadTextures();
+    }
 
-	void Game::init() {
-		if (SDL_Init(SDL_INIT_VIDEO) > 0) {
-			std::cout << "SDL_Init failed" << SDL_GetError() << std::endl;
-		}
-		gGUI = new GUI::gameGUI("2048 CLONE", 1280, 720);
-		gGUI->loadTextures();
-	}
-    
     GameLogic::Direction Game::keyEvent(SDL_Event& E) {
         switch (E.key.keysym.sym) {
             case SDLK_UP:
@@ -31,7 +31,6 @@ namespace Game {
     }
 
     void Game::run() {
-        init();
         bool gameRunning = true;
         SDL_Event event;
         while (gameRunning) {
@@ -51,9 +50,9 @@ namespace Game {
                 }
 
             }
-            gGUI->clear();
-            gGUI->renderScene(board.getBoard());
-            gGUI->display();
+            gGUI.clear();
+            gGUI.renderScene(board.getBoard());
+            gGUI.display();
         }
     }
 };

@@ -68,10 +68,10 @@ namespace GUI {
 	//gameGUI definitions
 	void gameGUI::loadTextures() {
 		for (uint8_t i = 1; i < 15; i++) {
-			std::string FilePath = "CreativeMindProject\\Imgs\\ (" + std::to_string(i) + ").bmp";
+			std::string FilePath = "CreativeMindProject\\assets\\ (" + std::to_string(i) + ").bmp";
 			textureMap[i] = this->loadTexture(FilePath.c_str());
 		}
-		std::string bgPath = "CreativeMindProject\\Imgs\\bg.bmp";
+		std::string bgPath = "CreativeMindProject\\assets\\bg.bmp";
 		this->bgImg = loadTexture(bgPath.c_str());
 
 	}
