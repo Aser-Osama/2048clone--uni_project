@@ -275,7 +275,6 @@ namespace GameLogic {
 		vCap = vCap + tilesChangedUndo;
 		tilesChangedUndo = 0;
 		ScoreChangedRedo = -ScoreChangedUndo;
-		std::cout << score;
 		score = score + ScoreChangedUndo;
 		ScoreChangedUndo = 0;
 
