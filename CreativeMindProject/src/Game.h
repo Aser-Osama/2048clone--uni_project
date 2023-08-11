@@ -15,12 +15,10 @@ namespace Game
 	private:
 		GUI::gameGUI gGUI;
 		GameLogic::Board board;
+		void PressButton();
 		GameLogic::Direction keyEvent(SDL_Event& E);
 		ButtonBounds redoBtn{ 851, 502, 1011, 567 };
 		ButtonBounds undoBtn{ 1045, 502, 1205, 567 };
-		//{ startX = 851, startY = 502,
-		//						endX = 1101, endY = 567};
-		//ButtonBou
 	public:
 		Game();
 		void run();

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <random>
+#include <math.h>
 #include <vector>
 #pragma once
 
@@ -100,6 +101,7 @@ namespace GameLogic {
 						}
 						else if (boardVec[k][j]->canMerge(*boardVec[k + dI][j])) { //above tile is mergable
 							boardVec[k + dI][j]->doubleVal();
+							score += unsigned(std::pow(2,unsigned(boardVec[k + dI][j]->getVal())));
 							delete boardVec[i][j];
 							boardVec[k][j] = nullptr;
 							this->vCap--;
@@ -110,6 +112,7 @@ namespace GameLogic {
 				else if (boardVec[i][j]->canMerge(*boardVec[i + dI][j])) { //above tile is mergable
 					moved = true;
 					boardVec[i + dI][j]->doubleVal();
+					score += unsigned(std::pow(2,unsigned(boardVec[i + dI][j]->getVal())));
 					delete boardVec[i][j];
 					boardVec[i][j] = nullptr;
 					this->vCap--;
@@ -124,6 +127,7 @@ namespace GameLogic {
 						}
 						else if (boardVec[k][j]->canMerge(*boardVec[k + dI][j])) { //above tile is also mergable
 							boardVec[k + dI][j]->doubleVal();
+							score += unsigned(std::pow(2,unsigned(boardVec[k + dI][j]->getVal())));
 							delete boardVec[k][j];
 							boardVec[k][j] = nullptr;
 							vCap--;
@@ -159,6 +163,7 @@ namespace GameLogic {
 						}
 						else if (boardVec[i][k]->canMerge(*boardVec[i][k + dJ])) { //left tile is mergable
 							boardVec[i][k + dJ]->doubleVal();
+							score += unsigned(std::pow(2,unsigned(boardVec[i][k + dJ]->getVal())));
 							this->vCap--;
 							this->tilesChangedUndo++;
 							delete boardVec[i][k];
@@ -169,9 +174,10 @@ namespace GameLogic {
 
 				//////////
 
-				else if (boardVec[i][j]->canMerge(*boardVec[i][j + dJ])) { //above tile is mergable
+				else if (boardVec[i][j]->canMerge(*boardVec[i][j + dJ])) { //left tile is mergable
 					moved = true;
 					boardVec[i][j + dJ]->doubleVal();
+					score += unsigned(std::pow(2,unsigned(boardVec[i][j + dJ]->getVal())));
 					delete boardVec[i][j];
 					boardVec[i][j] = nullptr;
 					vCap--; 
@@ -184,8 +190,9 @@ namespace GameLogic {
 							boardVec[i][k + dJ] = boardVec[i][k];
 							boardVec[i][k] = nullptr;
 						}
-						else if (boardVec[i][k]->canMerge(*boardVec[i][k + dJ])) { //above tile is also mergable
+						else if (boardVec[i][k]->canMerge(*boardVec[i][k + dJ])) { //left tile is also mergable
 							boardVec[i][k]->doubleVal();
+							score += unsigned(std::pow(2,unsigned(boardVec[i][k + dJ]->getVal())));
 							delete boardVec[i][k];
 							boardVec[i][k] = nullptr;
 							vCap--;
@@ -242,10 +249,6 @@ namespace GameLogic {
 		else {
 			tilesChangedUndo = tmp;
 		}
-		std::cout <<"Undo: " << signed(tilesChangedUndo) << std::endl;
-		std::cout << "Normal: " << unsigned(vCap) << std::endl;
-
-
 	}
 
 	void Board::undoMove() {
@@ -269,8 +272,6 @@ namespace GameLogic {
 
 		redoBoardVec = copyBoard(boardVec);
 		boardVec = copyBoard(undoBoardVec);
-		std::cout << "U_Undo: " << signed(tilesChangedUndo) << std::endl;
-		std::cout << "U_Normal: " << unsigned(vCap) << std::endl;
 	}
 
 	void Board::redoMove() {
@@ -292,8 +293,6 @@ namespace GameLogic {
 		}
 		undoBoardVec = copyBoard(boardVec);
 		boardVec = copyBoard(redoBoardVec);
-		std::cout << "R_Undo: " << signed(tilesChangedUndo) << std::endl;
-		std::cout << "R_Normal: " << unsigned(vCap) << std::endl;
 	}
 
 

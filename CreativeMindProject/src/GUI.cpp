@@ -15,7 +15,8 @@ namespace GUI {
 		mWindow = SDL_CreateWindow(pTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, pW, pH, SDL_WINDOW_SHOWN);
 		if (!mWindow) {
 			std::cout << "Window couldn't init: " << SDL_GetError() << std::endl;
-		}
+		}		
+
 		mRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED);
 	}
 
@@ -67,6 +68,7 @@ namespace GUI {
 
 	//gameGUI definitions
 	void gameGUI::loadTextures() {
+		mFont = TTF_OpenFont("CreativeMindProject\\assets\\LexendMega-Regular.ttf", 50);
 		for (uint8_t i = 1; i < 15; i++) {
 			std::string FilePath = "CreativeMindProject\\assets\\ (" + std::to_string(i) + ").bmp";
 			textureMap[i] = this->loadTexture(FilePath.c_str());
@@ -76,8 +78,10 @@ namespace GUI {
 
 	}
 
-	void gameGUI::renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec) {
+	void gameGUI::renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec, 
+		int score) {
 		this->renderBG();
+		this->renderText(score);
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				GameLogic::Tile* t = (boardVec)[i][j];
@@ -96,6 +100,25 @@ namespace GUI {
 	}
 	void gameGUI::renderBG() {
 		this->render(bgImg, NULL, NULL, NULL, NULL);
+	}
+
+	void gameGUI::renderText(uint32_t score)
+	{
+		std::string str;
+		int w, h;
+		int offsetdown = 0;
+		if (score >= 100000) {
+			offsetdown = 15;
+			TTF_SetFontSize(mFont, 35);
+		}
+		str = std::to_string(score);
+		SDL_Color c{ 0,0,0,255 };
+		SDL_Surface* s = TTF_RenderText_Blended(mFont, str.c_str(), c);
+		SDL_Texture* t = SDL_CreateTextureFromSurface(mRenderer, s);
+		SDL_FreeSurface(s);
+		SDL_QueryTexture(t, NULL, NULL, &w, &h);
+		render(t, (826 + 100 - w/2), 250 + offsetdown, w, h);
+		SDL_DestroyTexture(t);
 	}
 
 	gameGUI::~gameGUI() {

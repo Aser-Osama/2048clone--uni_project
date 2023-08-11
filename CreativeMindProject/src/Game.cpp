@@ -12,29 +12,17 @@ namespace Game {
             && y > this->startY && y < this->endY);
     }
 
-
     Game::Game() : gGUI("2048 CLONE", 1280, 720)
     {
         if (SDL_Init(SDL_INIT_VIDEO) > 0) {
             std::cout << "SDL_Init failed" << SDL_GetError() << std::endl;
             exit(1);
         }
+        if (TTF_Init() < 0) {
+            std::cout << "SDL_TTF failed" << SDL_GetError() << std::endl;
+            exit(1);
+        }
         gGUI.loadTextures();
-    }
-
-    GameLogic::Direction Game::keyEvent(SDL_Event& E) {
-        switch (E.key.keysym.sym) {
-            case SDLK_UP:
-                return GameLogic::Direction::up;
-            case SDLK_DOWN:
-                return GameLogic::Direction::down;
-            case SDLK_LEFT:
-                return GameLogic::Direction::left;
-            case SDLK_RIGHT:
-                return GameLogic::Direction::right;
-            default:
-                return GameLogic::Direction::none;
-            }
     }
 
     void Game::run() {
@@ -47,23 +35,40 @@ namespace Game {
                     break;
                 }
                 else if (event.type == SDL_KEYDOWN) {
-                    //m_oldboard = board.getboard
                     board.makeMove(keyEvent(event));
                 }
                 else if (event.type == SDL_MOUSEBUTTONDOWN) {
-                    int x, y;
-                    SDL_GetMouseState(&x, &y);
-                    if (undoBtn.withinBounds(x, y))
-                        board.undoMove();
-                    else if (redoBtn.withinBounds(x, y))
-                        board.redoMove();
+                    this->PressButton();
                 }
 
             }
             gGUI.clear();
-            gGUI.renderScene(board.getBoard());
+            gGUI.renderScene(board.getBoard(), board.getScore());
             gGUI.display();
         }
     }
 
+    GameLogic::Direction Game::keyEvent(SDL_Event& E) {
+        switch (E.key.keysym.sym) {
+        case SDLK_UP:
+            return GameLogic::Direction::up;
+        case SDLK_DOWN:
+            return GameLogic::Direction::down;
+        case SDLK_LEFT:
+            return GameLogic::Direction::left;
+        case SDLK_RIGHT:
+            return GameLogic::Direction::right;
+        default:
+            return GameLogic::Direction::none;
+        }
+    }
+
+    void Game::PressButton() {
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (undoBtn.withinBounds(x, y))
+            board.undoMove();
+        else if (redoBtn.withinBounds(x, y))
+            board.redoMove();
+    }
 };

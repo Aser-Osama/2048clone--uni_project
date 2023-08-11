@@ -45,7 +45,7 @@ namespace GameLogic
 		bool onUndo = false;		  // If current board is undo board (can't undo twice in a row)
 		bool onRedo = false;		  // If current board is redo board (can't undo twice in a row)
 		bool madeFirstMove = false;   // Used so user can't undo the initial board creation
-		
+		uint32_t score = 0;
 		bool makeMoveH(Direction d);
 		bool makeMoveV(Direction d);
 		void resetMergeStatus();
@@ -62,7 +62,7 @@ namespace GameLogic
 		bool isGameComplete();
 		void undoMove();
 		void redoMove();
-
+		int getScore() { return score; }
 
 		void printv(); //used for debugging along with gui
 
