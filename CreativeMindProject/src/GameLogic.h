@@ -42,6 +42,8 @@ namespace GameLogic
 		uint8_t vCap = 0;			  // Board capacity
 		int8_t tilesChangedUndo = 0; // To be able to update board capacity after undoing
 		int8_t tilesChangedRedo = 0; // To be able to update board capacity after redoing
+		int8_t ScoreChangedUndo = 0; // To be able to update board capacity after undoing
+		int8_t ScoreChangedRedo = 0; // To be able to update board capacity after redoing
 		bool onUndo = false;		  // If current board is undo board (can't undo twice in a row)
 		bool onRedo = false;		  // If current board is redo board (can't undo twice in a row)
 		bool madeFirstMove = false;   // Used so user can't undo the initial board creation
