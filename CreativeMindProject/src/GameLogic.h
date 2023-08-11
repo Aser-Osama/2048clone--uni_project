@@ -24,21 +24,21 @@ namespace GameLogic
 
 	class Board {
 	private:
-		std::vector<std::vector<Tile*>> boardVec =	{ 
+		std::vector<std::vector<Tile*>> boardVec = {
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr},
-								{nullptr, nullptr, nullptr, nullptr}};
+								{nullptr, nullptr, nullptr, nullptr} };
 		std::vector<std::vector<Tile*>> undoBoardVec = {
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr},
-								{nullptr, nullptr, nullptr, nullptr}};
+								{nullptr, nullptr, nullptr, nullptr} };
 		std::vector<std::vector<Tile*>> redoBoardVec = {
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr},
-								{nullptr, nullptr, nullptr, nullptr}};
+								{nullptr, nullptr, nullptr, nullptr} };
 		uint8_t vCap = 0;			  // Board capacity
 		int8_t tilesChangedUndo = 0; // To be able to update board capacity after undoing
 		int8_t tilesChangedRedo = 0; // To be able to update board capacity after redoing
@@ -54,20 +54,16 @@ namespace GameLogic
 		void addNewTile();
 		bool canCreateTile();
 		bool canMergeRemaining();
-		std::vector<std::vector<Tile*>> copyBoard(std::vector<std::vector<Tile*>>& );
+		std::vector<std::vector<Tile*>> copyBoard(std::vector<std::vector<Tile*>>&);
 	public:
 		~Board();
 		Board();
-
 		std::vector<std::vector<Tile*>>& getBoard();
 		void makeMove(Direction d);
 		bool isGameComplete();
 		void undoMove();
 		void redoMove();
-		int getScore() { return score; }
-
-		void printv(); //used for debugging along with gui
-
+		int32_t getScore() { return score; }
 	};
 
 };

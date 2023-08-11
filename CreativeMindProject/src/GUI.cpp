@@ -11,7 +11,7 @@
 #define GRID_SIZE 4
 namespace GUI {
 	//GUI definitions
-	GUI::GUI(const char* pTitle, int pW, int pH): mWindow(NULL), mRenderer(NULL) {
+	GUI::GUI(const char* pTitle, int16_t pW, int16_t pH) : mWindow(NULL), mRenderer(NULL), mFont(NULL) {
 		mWindow = SDL_CreateWindow(pTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, pW, pH, SDL_WINDOW_SHOWN);
 		if (!mWindow) {
 			std::cout << "Window couldn't init: " << SDL_GetError() << std::endl;
@@ -40,7 +40,7 @@ namespace GUI {
 		SDL_RenderClear(mRenderer);
 	}
 
-	void GUI::render(SDL_Texture* pTexture, int x, int y, int sx, int sy) {
+	void GUI::render(SDL_Texture* pTexture, int16_t x, int16_t y, int16_t sx, int16_t sy) {
 		SDL_Rect src;
 		SDL_Rect dst;
 		src.x = 0;
@@ -80,18 +80,18 @@ namespace GUI {
 	}
 
 	void gameGUI::renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec, 
-		int score) {
+		uint32_t score) {
 		this->renderBG();
 		this->renderText(score);
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
+		for (int8_t i = 0; i < 4; i++) {
+			for (int8_t j = 0; j < 4; j++) {
 				GameLogic::Tile* t = (boardVec)[i][j];
 				if (t) {
-					int val = t->getVal();
+					int8_t val = t->getVal();
 					if (val != -1) {
 
-						int x = (j)*TILE_W + 50 + (j * 4);
-						int y = (i)*TILE_H + (i * 4);
+						uint16_t x = (j)*TILE_W + 50 + (j * 4);
+						uint16_t y = (i)*TILE_H + (i * 4);
 						this->render(textureMap[val], x, y, TILE_H, TILE_W);
 					}
 				}

@@ -5,10 +5,10 @@
 namespace Game
 {
 	struct ButtonBounds {
-		int startX, startY, endX, endY;
-		ButtonBounds(int sx, int sy, int ex, int ey)
+		int16_t startX, startY, endX, endY;
+		ButtonBounds(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
 			: startX(sx), startY(sy), endX(ex), endY(ey) {}
-		bool withinBounds(int, int);
+		bool withinBounds(int16_t, int16_t);
 	};
 
 	class Game {

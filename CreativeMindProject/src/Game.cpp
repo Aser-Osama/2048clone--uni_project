@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 namespace Game { 
-    bool ButtonBounds::withinBounds(int x, int y)
+    bool ButtonBounds::withinBounds(int16_t x, int16_t y)
     {
         return (x > this->startX && x < this->endX
             && y > this->startY && y < this->endY);
