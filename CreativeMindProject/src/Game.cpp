@@ -43,6 +43,9 @@ namespace Game {
                     //m_oldboard = board.getboard
                     board.makeMove(keyEvent(event));
                 }
+                if (event.key.keysym.sym == SDLK_TAB) {
+                    this->board.undoMove();
+                }
                 else if (event.type == SDL_MOUSEBUTTONDOWN) {
                     int x, y;
                     SDL_GetMouseState(&x, &y);

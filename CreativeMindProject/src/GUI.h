@@ -23,7 +23,7 @@ namespace GUI {
 		std::map<uint8_t, SDL_Texture*> textureMap;
 		SDL_Texture* bgImg;
 	public:
-		gameGUI(const char* pTitle, int pW, int pH) : GUI(pTitle, pW, pH) {}
+		gameGUI(const char* pTitle, int pW, int pH) : GUI(pTitle, pW, pH), bgImg(NULL) {}
 		void loadTextures();
 		void renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec);
 		void renderBG();
