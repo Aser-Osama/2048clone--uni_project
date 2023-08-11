@@ -6,6 +6,13 @@
 #include <vector>
 #include <map>
 namespace Game { 
+    bool ButtonBounds::withinBounds(int x, int y)
+    {
+        return (x > this->startX && x < this->endX
+            && y > this->startY && y < this->endY);
+    }
+
+
     Game::Game() : gGUI("2048 CLONE", 1280, 720)
     {
         if (SDL_Init(SDL_INIT_VIDEO) > 0) {
@@ -43,13 +50,13 @@ namespace Game {
                     //m_oldboard = board.getboard
                     board.makeMove(keyEvent(event));
                 }
-                if (event.key.keysym.sym == SDLK_TAB) {
-                    this->board.undoMove();
-                }
                 else if (event.type == SDL_MOUSEBUTTONDOWN) {
                     int x, y;
                     SDL_GetMouseState(&x, &y);
-                    std::cout << "x = " << x << "y = " << y << "\n"; //will start mapping the area of the buttons later
+                    if (undoBtn.withinBounds(x, y))
+                        board.undoMove();
+                    else if (redoBtn.withinBounds(x, y))
+                        board.redoMove();
                 }
 
             }
@@ -58,4 +65,5 @@ namespace Game {
             gGUI.display();
         }
     }
+
 };

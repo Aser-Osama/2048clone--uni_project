@@ -44,7 +44,6 @@ namespace GameLogic {
 			} while (this->boardVec[randRow][randCol] != nullptr);
 			this->boardVec[randRow][randCol] = new Tile();
 			this->vCap++;
-			this->tilesChangedUndo--;
 		}
 	}
 
@@ -199,7 +198,7 @@ namespace GameLogic {
 		return moved;
 	}
 
-	std::vector<std::vector<Tile*>> Board::saveOldBoard()
+	std::vector<std::vector<Tile*>> Board::copyBoard(std::vector<std::vector<Tile*>>& b)
 	{
 		std::vector<std::vector<Tile*>> tmpBoard = 
 												{
@@ -209,8 +208,8 @@ namespace GameLogic {
 												{nullptr, nullptr, nullptr, nullptr}};
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				if (boardVec[i][j]) {
-					Tile* newTile = new Tile(boardVec[i][j]->getVal());
+				if (b[i][j]) {
+					Tile* newTile = new Tile(b[i][j]->getVal());
 					(tmpBoard)[i][j] = newTile;
 				}
 			}
@@ -219,14 +218,13 @@ namespace GameLogic {
 	}
 
 	void Board::makeMove(Direction d) {
-		std::cout << vCap << std::endl;
 		if (d == Direction::none)
 			return;
-		if (!madeFirstMove)
-			madeFirstMove = true;
+		
+		int tmp = tilesChangedUndo;			
+		tilesChangedUndo = 0;
 
-		this->tilesChangedUndo = 0;
-		std::vector<std::vector<Tile*>> tmpBoard = this->saveOldBoard();
+		std::vector<std::vector<Tile*>> tmpBoard = this->copyBoard(boardVec);
 		bool vertical = (d == Direction::up || d == Direction::down);
 		bool move_made = false;
 		if (vertical)
@@ -235,28 +233,67 @@ namespace GameLogic {
 			move_made = makeMoveH(d);
 
 		if (move_made) {
+			madeFirstMove = true;
 			this->addNewTile();
 			this->resetMergeStatus();
 			this->undoBoardVec = tmpBoard;
 			onUndo = false;
 		}
+		else {
+			tilesChangedUndo = tmp;
+		}
+		std::cout <<"Undo: " << signed(tilesChangedUndo) << std::endl;
+		std::cout << "Normal: " << unsigned(vCap) << std::endl;
+
+
 	}
 
 	void Board::undoMove() {
 		if (onUndo || !madeFirstMove)
 			return;
-		std::cout << "undoing?";
 		onUndo = true;
+		onRedo = false;
 		tilesChangedRedo = -tilesChangedUndo;
 		vCap = vCap + tilesChangedUndo;
-		for (auto r : redoBoardVec) {
-			for (auto t : r) {
-				delete t;
-				t = nullptr;
+		tilesChangedUndo = 0;
+
+
+		for (auto& r : redoBoardVec) {
+			for (auto& t : r) {
+				if (t) {
+					delete t;
+					t = nullptr;
+				}
 			}
 		}
-		redoBoardVec = boardVec;
-		boardVec = undoBoardVec;
+
+		redoBoardVec = copyBoard(boardVec);
+		boardVec = copyBoard(undoBoardVec);
+		std::cout << "U_Undo: " << signed(tilesChangedUndo) << std::endl;
+		std::cout << "U_Normal: " << unsigned(vCap) << std::endl;
+	}
+
+	void Board::redoMove() {
+		if (!onUndo || !madeFirstMove || onRedo)
+			return;
+		onUndo = false;
+		onRedo = true;
+		tilesChangedUndo = -tilesChangedRedo;
+		vCap = vCap + tilesChangedRedo;
+		tilesChangedRedo = 0;
+
+		for (auto& r : undoBoardVec) {
+			for (auto& t : r) {
+				if (t) {
+					delete t;
+					t = nullptr;
+				}
+			}
+		}
+		undoBoardVec = copyBoard(boardVec);
+		boardVec = copyBoard(redoBoardVec);
+		std::cout << "R_Undo: " << signed(tilesChangedUndo) << std::endl;
+		std::cout << "R_Normal: " << unsigned(vCap) << std::endl;
 	}
 
 

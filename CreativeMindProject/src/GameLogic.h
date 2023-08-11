@@ -39,26 +39,32 @@ namespace GameLogic
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr}};
-
 		uint8_t vCap = 0;			  // Board capacity
-		uint8_t tilesChangedUndo = 0; // To be able to update board capacity after undoing
-		uint8_t tilesChangedRedo = 0; // To be able to update board capacity after redoing
+		int8_t tilesChangedUndo = 0; // To be able to update board capacity after undoing
+		int8_t tilesChangedRedo = 0; // To be able to update board capacity after redoing
 		bool onUndo = false;		  // If current board is undo board (can't undo twice in a row)
+		bool onRedo = false;		  // If current board is redo board (can't undo twice in a row)
 		bool madeFirstMove = false;   // Used so user can't undo the initial board creation
-	public:
-		Board();
-		bool isGameComplete();
+		
 		bool makeMoveH(Direction d);
 		bool makeMoveV(Direction d);
-		void makeMove(Direction d);
-		std::vector<std::vector<Tile*>> saveOldBoard();
 		void resetMergeStatus();
-		bool canMergeRemaining();
-		void printv(); //used for debugging along with gui
 		void addNewTile();
-		void undoMove();
 		bool canCreateTile();
+		bool canMergeRemaining();
+		std::vector<std::vector<Tile*>> copyBoard(std::vector<std::vector<Tile*>>& );
+
+	public:
+		Board();
+
 		std::vector<std::vector<Tile*>>& getBoard();
+		void makeMove(Direction d);
+		bool isGameComplete();
+		void undoMove();
+		void redoMove();
+
+
+		void printv(); //used for debugging along with gui
 
 	};
 
