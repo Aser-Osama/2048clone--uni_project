@@ -48,6 +48,7 @@ namespace GameLogic {
 		}
 	}
 
+
 	void Board::resetMergeStatus() {
 		for (uint8_t i = 0; i < 4; i++) {
 			for (uint8_t j = 0; j < 4; j++) {
@@ -335,6 +336,25 @@ namespace GameLogic {
 
 	bool Board::isGameComplete() {
 		return !(canCreateTile() || canMergeRemaining());
+	}
+	Board::~Board()
+	{
+		for (uint8_t i = 0; i < 4; i++) {
+			for (uint8_t j = 0; j < 4; j++) {
+				if (boardVec[i][j]) {
+					delete boardVec[i][j];
+					boardVec[i][j] = nullptr;
+				}
+				if (undoBoardVec[i][j]) {
+					delete undoBoardVec[i][j];
+					undoBoardVec[i][j] = nullptr;
+				}				
+				if (redoBoardVec[i][j]) {
+					delete redoBoardVec[i][j];
+					redoBoardVec[i][j] = nullptr;
+				}
+			}
+		}
 	}
 
 };

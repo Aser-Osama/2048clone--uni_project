@@ -53,8 +53,8 @@ namespace GameLogic
 		bool canCreateTile();
 		bool canMergeRemaining();
 		std::vector<std::vector<Tile*>> copyBoard(std::vector<std::vector<Tile*>>& );
-
 	public:
+		~Board();
 		Board();
 
 		std::vector<std::vector<Tile*>>& getBoard();

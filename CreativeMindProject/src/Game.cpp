@@ -12,6 +12,13 @@ namespace Game {
             && y > this->startY && y < this->endY);
     }
 
+    void Game::restartGame()
+    {
+        delete board;
+        board = new GameLogic::Board;
+
+    }
+
     Game::Game() : gGUI("2048 CLONE", 1280, 720)
     {
         if (SDL_Init(SDL_INIT_VIDEO) > 0) {
@@ -23,6 +30,7 @@ namespace Game {
             exit(1);
         }
         gGUI.loadTextures();
+        board = new GameLogic::Board();
     }
 
     void Game::run() {
@@ -30,12 +38,12 @@ namespace Game {
         SDL_Event event;
         while (gameRunning) {
             while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT || board.isGameComplete()){
+                if (event.type == SDL_QUIT || board->isGameComplete()){
                     gameRunning = false;
                     break;
                 }
                 else if (event.type == SDL_KEYDOWN) {
-                    board.makeMove(keyEvent(event));
+                    board->makeMove(keyEvent(event));
                 }
                 else if (event.type == SDL_MOUSEBUTTONDOWN) {
                     this->PressButton();
@@ -43,7 +51,7 @@ namespace Game {
 
             }
             gGUI.clear();
-            gGUI.renderScene(board.getBoard(), board.getScore());
+            gGUI.renderScene(board->getBoard(), board->getScore());
             gGUI.display();
         }
     }
@@ -67,8 +75,10 @@ namespace Game {
         int x, y;
         SDL_GetMouseState(&x, &y);
         if (undoBtn.withinBounds(x, y))
-            board.undoMove();
+            board->undoMove();
         else if (redoBtn.withinBounds(x, y))
-            board.redoMove();
+            board->redoMove();
+        else if (restartBtn.withinBounds(x, y))
+            this->restartGame();
     }
 };

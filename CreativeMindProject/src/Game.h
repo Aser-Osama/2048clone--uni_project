@@ -14,11 +14,13 @@ namespace Game
 	class Game {
 	private:
 		GUI::gameGUI gGUI;
-		GameLogic::Board board;
-		void PressButton();
-		GameLogic::Direction keyEvent(SDL_Event& E);
+		GameLogic::Board* board;
 		ButtonBounds redoBtn{ 851, 502, 1011, 567 };
 		ButtonBounds undoBtn{ 1045, 502, 1205, 567 };
+		ButtonBounds restartBtn{ 826, 586, 1230, 651 };
+		void PressButton();
+		GameLogic::Direction keyEvent(SDL_Event& E);
+		void restartGame();
 	public:
 		Game();
 		void run();
