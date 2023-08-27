@@ -7,15 +7,13 @@
 #define TILE_W 177
 #define TILE_H 177
 
-
-#define GRID_SIZE 4
 namespace GUI {
 	//GUI definitions
 	GUI::GUI(const char* pTitle, int16_t pW, int16_t pH) : mWindow(NULL), mRenderer(NULL), mFont(NULL) {
 		mWindow = SDL_CreateWindow(pTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, pW, pH, SDL_WINDOW_SHOWN);
 		if (!mWindow) {
 			std::cout << "Window couldn't init: " << SDL_GetError() << std::endl;
-		}		
+		}
 
 		mRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED);
 	}
@@ -29,6 +27,7 @@ namespace GUI {
 		SDL_Texture* texture = NULL;
 		texture = SDL_CreateTextureFromSurface(mRenderer, surface);
 		SDL_FreeSurface(surface);
+
 		if (!texture) {
 			std::cout << "Couldn't create texture from surface: " << SDL_GetError() << std::endl;
 			return nullptr;
@@ -40,28 +39,16 @@ namespace GUI {
 		SDL_RenderClear(mRenderer);
 	}
 
-	void GUI::render(SDL_Texture* pTexture, int16_t x, int16_t y, int16_t sx, int16_t sy) {
-		SDL_Rect src;
-		SDL_Rect dst;
-		src.x = 0;
-		src.y =0;
-		if (sx != NULL || sy != NULL) {
-			dst.x = x;
-			dst.y = y;
-			src.w = dst.w = sx;
-			src.h = dst.h = sy;
-			SDL_RenderCopy(mRenderer, pTexture, &src, &dst);
-		}
-		else {
-			SDL_RenderCopy(mRenderer, pTexture, NULL, NULL);
-		}
+	void GUI::render(SDL_Texture* pTexture, SDL_Rect* src, SDL_Rect* dst) {
+
+		SDL_RenderCopy(mRenderer, pTexture, src, dst);
 	}
 
 	void GUI::display() {
 		SDL_RenderPresent(mRenderer);
 	}
 
-	GUI::~GUI(){
+	GUI::~GUI() {
 		SDL_DestroyWindow(mWindow);
 	}
 
@@ -70,16 +57,11 @@ namespace GUI {
 	void gameGUI::loadTextures() {
 
 		mFont = TTF_OpenFont("assets\\LexendMega-Regular.ttf", 50);
-		for (uint8_t i = 1; i < 15; i++) {
-			std::string FilePath = "assets\\(" + std::to_string(i) + ").bmp";
-			textureMap[i] = this->loadTexture(FilePath.c_str());
-		}
-		std::string bgPath = "assets\\bg.bmp";
-		this->bgImg = loadTexture(bgPath.c_str());
-
+		tileTexture = this->loadTexture("assets\\tiles.bmp");
+		this->bgImg = loadTexture("assets\\bg.bmp");
 	}
 
-	void gameGUI::renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec, 
+	void gameGUI::renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec,
 		uint32_t score) {
 		this->renderBG();
 		this->renderText(score);
@@ -89,10 +71,18 @@ namespace GUI {
 				if (t) {
 					int8_t val = t->getVal();
 					if (val != -1) {
+						SDL_Rect dst{
+							dst.x = (j)*TILE_W + 50 + (j * 4),
+							dst.y = (i)*TILE_H + (i * 4),
+							dst.w = TILE_W,
+							dst.h = TILE_H };
+						SDL_Rect src{
+							src.x = (val - 1) * 177,
+							src.y = 0,
+							src.w = TILE_W,
+							src.h = TILE_H };
 
-						uint16_t x = (j)*TILE_W + 50 + (j * 4);
-						uint16_t y = (i)*TILE_H + (i * 4);
-						this->render(textureMap[val], x, y, TILE_H, TILE_W);
+						this->render(tileTexture, &src, &dst);
 					}
 				}
 			}
@@ -100,7 +90,7 @@ namespace GUI {
 
 	}
 	void gameGUI::renderBG() {
-		this->render(bgImg, NULL, NULL, NULL, NULL);
+		this->render(bgImg, NULL, NULL);
 	}
 
 	void gameGUI::renderText(uint32_t score)
@@ -118,14 +108,18 @@ namespace GUI {
 		SDL_Texture* t = SDL_CreateTextureFromSurface(mRenderer, s);
 		SDL_FreeSurface(s);
 		SDL_QueryTexture(t, NULL, NULL, &w, &h);
-		render(t, (826 + 100 - w/2), 250 + offsetdown, w, h);
+		SDL_Rect dst{
+			dst.x = (826 + 100 - w / 2),
+			dst.y = 250 + offsetdown,
+			dst.w = w,
+			dst.h = h,
+		};
+		render(t, NULL, &dst);
 		SDL_DestroyTexture(t);
 	}
 
 	gameGUI::~gameGUI() {
-		for (auto& e : textureMap) {
-			SDL_DestroyTexture(e.second);
-		}
+		SDL_DestroyTexture(tileTexture);
 	}
 };
 

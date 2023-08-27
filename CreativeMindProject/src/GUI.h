@@ -10,7 +10,7 @@ namespace GUI {
 			SDL_Window* mWindow;
 			SDL_Renderer* mRenderer;
 			TTF_Font* mFont;
-			void render(SDL_Texture* pTexture, int16_t x, int16_t y, int16_t sx, int16_t sy);
+			void render(SDL_Texture* pTexture, SDL_Rect*, SDL_Rect*);
 			GUI(const char* pTitle, int16_t pW, int16_t pH);
 			SDL_Texture* loadTexture(const char* pFilePath);
 	public:			
@@ -21,7 +21,7 @@ namespace GUI {
 
 	class gameGUI : public GUI {
 	private:
-		std::map<uint8_t, SDL_Texture*> textureMap;
+		SDL_Texture* tileTexture;
 		SDL_Texture* bgImg;
 	public:
 		gameGUI(const char* pTitle, int16_t pW, int16_t pH) : GUI(pTitle, pW, pH), bgImg(NULL) {}
