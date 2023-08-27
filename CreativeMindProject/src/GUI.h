@@ -27,6 +27,7 @@ namespace GUI {
 		gameGUI(const char* pTitle, int16_t pW, int16_t pH) : GUI(pTitle, pW, pH), bgImg(NULL) {}
 		void loadTextures();
 		void renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec, uint32_t);
+		void renderMovement(SDL_Rect oldSrc, SDL_Rect oldDst, SDL_Rect newSrc, SDL_Rect newDst);
 		void renderBG();
 		void renderText(uint32_t);
 		~gameGUI();

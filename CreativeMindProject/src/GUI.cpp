@@ -40,7 +40,6 @@ namespace GUI {
 	}
 
 	void GUI::render(SDL_Texture* pTexture, SDL_Rect* src, SDL_Rect* dst) {
-
 		SDL_RenderCopy(mRenderer, pTexture, src, dst);
 	}
 
@@ -81,7 +80,6 @@ namespace GUI {
 							src.y = 0,
 							src.w = TILE_W,
 							src.h = TILE_H };
-
 						this->render(tileTexture, &src, &dst);
 					}
 				}

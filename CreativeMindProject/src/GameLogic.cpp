@@ -7,11 +7,13 @@
 #pragma once
 
 namespace GameLogic {
-	Tile::Tile(uint8_t val)
+	Tile::Tile(uint8_t val, uint16_t tID)
 	{
 		tileVal = val;
+		tileID = tID;
 	}
 	Tile::Tile() {
+		tileID++;
 		int8_t rand = std::rand() % 11;
 		if (rand == 10) {
 			tileVal = 2;
@@ -20,9 +22,23 @@ namespace GameLogic {
 			tileVal = 1;
 		}
 	}
-	void Tile::doubleVal() {
+	void Tile::doubleVal(int i, int j) {
+		oldTile_I = i;
+		oldTile_J = j;
+		oldTileVal = tileVal;
 		this->tileVal = this->tileVal + 1;
 		merged = true;
+	}
+	void Tile::updateOldPosition(int i, int j)
+	{
+		oldTile_I = i;
+		oldTile_J = j;
+	}
+	void Tile::getOldValues(int* i, int* j, int* val)
+	{
+		*i = oldTile_I;
+		*j = oldTile_J;
+		*val = oldTileVal;
 	}
 	uint8_t Tile::getVal() {
 		return this->tileVal;
@@ -33,6 +49,11 @@ namespace GameLogic {
 	void Tile::resetMergeStatus() {
 		merged = false;
 	}
+	uint16_t Tile::getID()
+	{
+		return tileID;
+	}
+	uint16_t Tile::tileID = 0;
 
 	//Board class definitions
 	Board::Board() {
@@ -88,24 +109,31 @@ namespace GameLogic {
 			for (int8_t j = 0; j < 4; j++) {
 				if (boardVec[i][j] == nullptr)
 					continue;
-				if (boardVec[i + dI][j] == nullptr) { //above tile is empty
+
+				// The tile can be moved up or down
+				if (boardVec[i + dI][j] == nullptr) {
 					boardVec[i + dI][j] = boardVec[i][j];
+					boardVec[i][j]->updateOldPosition(i, j);
 					boardVec[i][j] = nullptr;
 					moved = true;
-					for (uint8_t k = i + dI; up ? k > 0 : k < 3; k += dI) { //to move up as far as possible
+
+					// Checking if tile is not stuck in place
+					for (uint8_t k = i + dI; up ? k > 0 : k < 3; k += dI) { 
 						if (boardVec[k][j] == nullptr)
 							continue;
 
-						if (boardVec[k + dI][j] == nullptr) { //above tile is also empty
+						// The tile can be moved up or down
+						if (boardVec[k + dI][j] == nullptr) { 
 							boardVec[k + dI][j] = boardVec[k][j];
+							boardVec[k][j]->updateOldPosition(k, j);
 							boardVec[k][j] = nullptr;
 						}
-						else if (boardVec[k][j]->canMerge(*boardVec[k + dI][j])) { //above tile is mergable
-							boardVec[k + dI][j]->doubleVal();
+
+						// The tile can be merged with one above or below
+						else if (boardVec[k][j]->canMerge(*boardVec[k + dI][j])) { 
+							boardVec[k + dI][j]->doubleVal(i, j);
 							score += static_cast<uint32_t>(std::pow(2,static_cast<uint32_t>(boardVec[k + dI][j]->getVal())));
 							this->ScoreChangedUndo -= static_cast<uint32_t>(std::pow(2, static_cast<uint32_t>(boardVec[k + dI][j]->getVal())));
-							
-
 							delete boardVec[i][j];
 							boardVec[k][j] = nullptr;
 							this->vCap--;
@@ -113,9 +141,11 @@ namespace GameLogic {
 						}
 					}
 				}
+
+				// The tile can be merged with one above or below
 				else if (boardVec[i][j]->canMerge(*boardVec[i + dI][j])) { //above tile is mergable
 					moved = true;
-					boardVec[i + dI][j]->doubleVal();
+					boardVec[i + dI][j]->doubleVal(i, j);
 					score += static_cast<uint32_t>(std::pow(2,static_cast<uint32_t>(boardVec[i + dI][j]->getVal())));
 					this->ScoreChangedUndo -= static_cast<uint32_t>(std::pow(2, static_cast<uint32_t>(boardVec[i + dI][j]->getVal())));
 					delete boardVec[i][j];
@@ -126,12 +156,16 @@ namespace GameLogic {
 						if (boardVec[k][j] == nullptr)
 							continue;
 
+						// The tile can be moved up or down
 						if (boardVec[k + dI][j] == nullptr) { //above tile is empty
 							boardVec[k + dI][j] = boardVec[k][j];
+							boardVec[k][j]->updateOldPosition(i, j);
 							boardVec[k][j] = nullptr;
 						}
+
+						// The tile can be merged with one above or below
 						else if (boardVec[k][j]->canMerge(*boardVec[k + dI][j])) { //above tile is also mergable
-							boardVec[k + dI][j]->doubleVal();
+							boardVec[k + dI][j]->doubleVal(i, j);
 							score += static_cast<uint32_t>(std::pow(2,static_cast<uint32_t>(boardVec[k + dI][j]->getVal())));
 							this->ScoreChangedUndo -= static_cast<uint32_t>(std::pow(2, static_cast<uint32_t>(boardVec[k + dI][j]->getVal())));
 							delete boardVec[k][j];
@@ -156,20 +190,25 @@ namespace GameLogic {
 				if (boardVec[i][j] == nullptr)
 					continue;
 
-				if (boardVec[i][j + dJ] == nullptr) { //left tile is empty
+				// Tile can be moved right or left
+				if (boardVec[i][j + dJ] == nullptr) {
 					boardVec[i][j + dJ] = boardVec[i][j];
+					boardVec[i][j]->updateOldPosition(i, j);
 					boardVec[i][j] = nullptr;
 					moved = true;
+
+
 					for (int8_t k = j + dJ; Left ? k > 0: k < 3; k += dJ) { //to move left as far as possible
 						if (boardVec[i][k] == nullptr)
 							continue;
 
 						if (boardVec[i][k + dJ] == nullptr) { //left tile is also empty
 							boardVec[i][k + dJ] = boardVec[i][k];
+							boardVec[i][k]->updateOldPosition(i, k);
 							boardVec[i][k] = nullptr;
 						}
 						else if (boardVec[i][k]->canMerge(*boardVec[i][k + dJ])) { //left tile is mergable
-							boardVec[i][k + dJ]->doubleVal();
+							boardVec[i][k + dJ]->doubleVal(i, j);
 							score += static_cast<uint32_t>(std::pow(2,static_cast<uint32_t>(boardVec[i][k + dJ]->getVal())));
 							ScoreChangedUndo -= static_cast<uint32_t>(std::pow(2, static_cast<uint32_t>(boardVec[i][k + dJ]->getVal())));
 							this->vCap--;
@@ -184,7 +223,7 @@ namespace GameLogic {
 
 				else if (boardVec[i][j]->canMerge(*boardVec[i][j + dJ])) { //left tile is mergable
 					moved = true;
-					boardVec[i][j + dJ]->doubleVal();
+					boardVec[i][j + dJ]->doubleVal(i, j);
 					score += static_cast<uint32_t>(std::pow(2,static_cast<uint32_t>(boardVec[i][j + dJ]->getVal())));
 					ScoreChangedUndo -= static_cast<uint32_t>(std::pow(2, static_cast<uint32_t>(boardVec[i][j + dJ]->getVal())));
 					delete boardVec[i][j];
@@ -197,10 +236,11 @@ namespace GameLogic {
 
 						if (boardVec[i][k + dJ] == nullptr) { //above tile is empty
 							boardVec[i][k + dJ] = boardVec[i][k];
+							boardVec[i][k]->updateOldPosition(i, k);
 							boardVec[i][k] = nullptr;
 						}
 						else if (boardVec[i][k]->canMerge(*boardVec[i][k + dJ])) { //left tile is also mergable
-							boardVec[i][k]->doubleVal();
+							boardVec[i][k]->doubleVal(i, j);
 							score += static_cast<uint32_t>(std::pow(2,static_cast<uint32_t>(boardVec[i][k + dJ]->getVal())));
 							ScoreChangedUndo -= static_cast<uint32_t>(std::pow(2, static_cast<uint32_t>(boardVec[i][k + dJ]->getVal())));
 							delete boardVec[i][k];
@@ -226,7 +266,7 @@ namespace GameLogic {
 		for (int8_t i = 0; i < 4; i++) {
 			for (int8_t j = 0; j < 4; j++) {
 				if (b[i][j]) {
-					Tile* newTile = new Tile(b[i][j]->getVal());
+					Tile* newTile = new Tile(b[i][j]->getVal(), b[i][j]->getID());
 					(tmpBoard)[i][j] = newTile;
 				}
 			}
