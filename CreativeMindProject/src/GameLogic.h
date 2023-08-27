@@ -7,31 +7,41 @@ namespace GameLogic
 		none, up, down, left, right
 	};
 
+	struct tilePosHistory {
+		uint8_t oldTile_I = 0;
+		uint8_t oldTile_J = 0;
+		uint8_t Tile_I;
+		uint8_t Tile_J;		
+		bool justMoved = false;
+	};
+
 	class Tile {
 	private:
-		uint8_t tileVal;
-		uint8_t oldTileVal = -1;
-		static uint16_t tileID;
-		uint8_t oldTile_I = -1;
-		uint8_t oldTile_J = -1;
+		static uint16_t tileID; // Unused but could be helpful for the score.
+		uint8_t tileVal = 0;
+		uint8_t oldTileVal = 0;
+		tilePosHistory Position;
 		bool merged = false;
 	public:
 		Tile(uint8_t val, uint16_t tID);
 		Tile();
-		//Tile(Tile& t);
-		uint8_t getVal();
 		bool canMerge(Tile tile);
-		void doubleVal(int i, int j);
-		void updateOldPosition(int i, int j);
-		void getOldValues(int* i, int* j, int* val);
-		void resetMergeStatus();
+		uint8_t getVal();
 		uint16_t getID();
+		bool hasMoved(); 
+		void doubleVal(int i, int j);
+		void updatePosition(int i, int j);
+		void updateOldPosition(int i, int j);
+		void getValues(int* i, int* j, int* val);
+		void getOldValues(int* i, int* j, int* val);
+		void resetMergeStatus(); // Used to avoid tiles merging twice in the same move.
+		void resetMoved(); 
 	};
 
 
 	class Board {
 	private:
-		std::vector<std::vector<Tile*>> boardVec = {
+		std::vector < std::vector<Tile*> > boardVec = {
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr},
@@ -46,6 +56,7 @@ namespace GameLogic
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr},
 								{nullptr, nullptr, nullptr, nullptr} };
+		uint32_t score = 0;
 		uint8_t vCap = 0;			 // Board capacity
 		int8_t tilesChangedUndo = 0; // To be able to update board capacity after undoing
 		int8_t tilesChangedRedo = 0; // To be able to update board capacity after redoing
@@ -54,23 +65,23 @@ namespace GameLogic
 		bool onUndo = false;		 // If current board is undo board (can't undo twice in a row)
 		bool onRedo = false;		 // If current board is redo board (can't undo twice in a row)
 		bool madeFirstMove = false;  // Used so user can't undo the initial board creation
-		uint32_t score = 0;
+		
+		std::vector<std::vector<Tile*>> copyBoard(std::vector<std::vector<Tile*>>&);
+		void resetMergeStatus();     // Resets all tiles' haveMoved flag
+		void addNewTile();
 		bool makeMoveH(Direction d);
 		bool makeMoveV(Direction d);
-		void resetMergeStatus();
-		void addNewTile();
 		bool canCreateTile();
 		bool canMergeRemaining();
-		std::vector<std::vector<Tile*>> copyBoard(std::vector<std::vector<Tile*>>&);
 	public:
-		~Board();
 		Board();
+		~Board();
 		std::vector<std::vector<Tile*>>& getBoard();
-		void makeMove(Direction d);
+		int32_t getScore();
 		bool isGameComplete();
+		void makeMove(Direction d);
 		void undoMove();
 		void redoMove();
-		int32_t getScore() { return score; }
 	};
 
 };

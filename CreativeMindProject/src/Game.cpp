@@ -31,28 +31,34 @@ namespace Game {
         }
         gGUI.loadTextures();
         board = new GameLogic::Board();
+        gGUI.renderScene(board->getBoard(), board->getScore());
     }
 
     void Game::run() {
         bool gameRunning = true;
         SDL_Event event;
         while (gameRunning) {
+            uint64_t start = SDL_GetPerformanceCounter();
             while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT || board->isGameComplete()){
+                if (event.type == SDL_QUIT || board->isGameComplete()) {
                     gameRunning = false;
                     break;
                 }
                 else if (event.type == SDL_KEYDOWN) {
                     board->makeMove(keyEvent(event));
+                    gGUI.renderScene(board->getBoard(), board->getScore());
                 }
                 else if (event.type == SDL_MOUSEBUTTONDOWN) {
                     this->PressButton();
+                    gGUI.renderScene(board->getBoard(), board->getScore());
                 }
 
             }
-            gGUI.clear();
-            gGUI.renderScene(board->getBoard(), board->getScore());
-            gGUI.display();
+            uint64_t end = SDL_GetPerformanceCounter();
+
+            float elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
+
+            SDL_Delay(floor(16.666f - elapsedMS));
         }
     }
 

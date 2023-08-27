@@ -7,12 +7,12 @@
 namespace GUI {
 	class GUI {
 	protected:
-			SDL_Window* mWindow;
-			SDL_Renderer* mRenderer;
-			TTF_Font* mFont;
-			void render(SDL_Texture* pTexture, SDL_Rect*, SDL_Rect*);
-			GUI(const char* pTitle, int16_t pW, int16_t pH);
-			SDL_Texture* loadTexture(const char* pFilePath);
+		SDL_Window* mWindow;
+		SDL_Renderer* mRenderer;
+		TTF_Font* mFont;
+		void render(SDL_Texture* pTexture, SDL_Rect*, SDL_Rect*);
+		GUI(const char* pTitle, int16_t pW, int16_t pH);
+		SDL_Texture* loadTexture(const char* pFilePath);
 	public:			
 		virtual void clear();
 		virtual void display();
@@ -27,9 +27,9 @@ namespace GUI {
 		gameGUI(const char* pTitle, int16_t pW, int16_t pH) : GUI(pTitle, pW, pH), bgImg(NULL) {}
 		void loadTextures();
 		void renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec, uint32_t);
-		void renderMovement(SDL_Rect oldSrc, SDL_Rect oldDst, SDL_Rect newSrc, SDL_Rect newDst);
+		void renderMovement(const std::vector<std::vector<GameLogic::Tile*>>& boardVec, uint32_t score);
 		void renderBG();
-		void renderText(uint32_t);
+		void renderScore(uint32_t);
 		~gameGUI();
 	};
 }

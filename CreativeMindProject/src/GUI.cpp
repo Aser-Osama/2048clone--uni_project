@@ -60,38 +60,64 @@ namespace GUI {
 		this->bgImg = loadTexture("assets\\bg.bmp");
 	}
 
-	void gameGUI::renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec,
-		uint32_t score) {
-		this->renderBG();
-		this->renderText(score);
+	void gameGUI::renderMovement(const std::vector<std::vector<GameLogic::Tile*>>& boardVec, uint32_t score)
+	{
+		int index = 0;
+		int movedindex = 0;
+		GameLogic::Tile* Tiles[16]{};
+		GameLogic::Tile* TilesMoved[16]{};
+
 		for (int8_t i = 0; i < 4; i++) {
 			for (int8_t j = 0; j < 4; j++) {
 				GameLogic::Tile* t = (boardVec)[i][j];
 				if (t) {
 					int8_t val = t->getVal();
 					if (val != -1) {
-						SDL_Rect dst{
-							dst.x = (j)*TILE_W + 50 + (j * 4),
-							dst.y = (i)*TILE_H + (i * 4),
-							dst.w = TILE_W,
-							dst.h = TILE_H };
-						SDL_Rect src{
-							src.x = (val - 1) * 177,
-							src.y = 0,
-							src.w = TILE_W,
-							src.h = TILE_H };
-						this->render(tileTexture, &src, &dst);
+						Tiles[index++] = t;
 					}
 				}
 			}
 		}
 
+		for (GameLogic::Tile* t : Tiles)
+		{
+			if (!t)
+				break;
+
+			int i, j, val;
+			SDL_Rect dst, olddst, src;
+			t->getValues(&i, &j, &val);
+
+				dst = {
+					dst.x = (j)*TILE_W + 50 + (j * 4),
+					dst.y = (i)*TILE_H + (i * 4),
+					dst.w = TILE_W,
+					dst.h = TILE_H };
+
+				src = {
+					src.x = (val - 1) * 177,
+					src.y = 0,
+					src.w = TILE_W,
+					src.h = TILE_H };
+				this->render(tileTexture, &src, &dst);
+		}
+		
 	}
+
+	void gameGUI::renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec,
+		uint32_t score) {
+		this->clear();
+		this->renderBG();
+		this->renderScore(score);
+		this->renderMovement(boardVec, score);
+		this->display();
+	}
+
 	void gameGUI::renderBG() {
 		this->render(bgImg, NULL, NULL);
 	}
 
-	void gameGUI::renderText(uint32_t score)
+	void gameGUI::renderScore(uint32_t score)
 	{
 		std::string str;
 		int w, h;
