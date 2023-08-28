@@ -8,11 +8,14 @@ namespace GameLogic
 	};
 
 	struct tilePosHistory {
-		uint8_t oldTile_I = 0;
-		uint8_t oldTile_J = 0;
+		uint8_t oldTile_I = -1;
+		uint8_t oldTile_J = -1;
 		uint8_t Tile_I;
 		uint8_t Tile_J;		
 		bool justMoved = false;
+		bool justMerged = false;
+		bool madeFirstMove = false;		
+
 	};
 
 	class Tile {
@@ -28,14 +31,18 @@ namespace GameLogic
 		bool canMerge(Tile tile);
 		uint8_t getVal();
 		uint16_t getID();
-		bool hasMoved(); 
+		bool hasMoved();
+		bool hasMerged();
+		bool madeFirstMove();
 		void doubleVal(int i, int j);
 		void updatePosition(int i, int j);
 		void updateOldPosition(int i, int j);
 		void getValues(int* i, int* j, int* val);
 		void getOldValues(int* i, int* j, int* val);
 		void resetMergeStatus(); // Used to avoid tiles merging twice in the same move.
-		void resetMoved(); 
+		void resetMoved();
+		void resetMerge();
+
 	};
 
 
@@ -68,6 +75,7 @@ namespace GameLogic
 		
 		std::vector<std::vector<Tile*>> copyBoard(std::vector<std::vector<Tile*>>&);
 		void resetMergeStatus();     // Resets all tiles' haveMoved flag
+		void resetMovedStatus();     // Resets all tiles' haveMoved flag
 		void addNewTile();
 		bool makeMoveH(Direction d);
 		bool makeMoveV(Direction d);
@@ -79,7 +87,7 @@ namespace GameLogic
 		std::vector<std::vector<Tile*>>& getBoard();
 		int32_t getScore();
 		bool isGameComplete();
-		void makeMove(Direction d);
+		bool makeMove(Direction d);
 		void undoMove();
 		void redoMove();
 	};

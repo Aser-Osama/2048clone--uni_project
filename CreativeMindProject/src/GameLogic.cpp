@@ -22,14 +22,14 @@ namespace GameLogic {
 		}
 	}
 	void Tile::doubleVal(int i, int j) {
-		this->updateOldPosition(i, j);
-
+		this->Position.justMerged = true;
 		oldTileVal = tileVal;
 		this->tileVal = this->tileVal + 1;
 		merged = true;
 	}
 	void Tile::updateOldPosition(int i, int j) {
 		Position.justMoved = true;
+		Position.madeFirstMove = true;
 		this->Position.oldTile_I = i;
 		this->Position.oldTile_J = j;
 	}
@@ -62,8 +62,19 @@ namespace GameLogic {
 	bool Tile::hasMoved() {
 		return Position.justMoved;
 	}
+	bool Tile::hasMerged()
+	{
+		return Position.justMerged;
+	}
+	bool Tile::madeFirstMove()
+	{
+		return Position.madeFirstMove;
+	}
 	void Tile::resetMoved() {
 		Position.justMoved = false;
+	}
+	void Tile::resetMerge() {
+		this->Position.justMerged = false;
 	}
 	uint16_t Tile::tileID = 0;
 
@@ -87,6 +98,16 @@ namespace GameLogic {
 			for (uint8_t j = 0; j < 4; j++) {
 				if (boardVec[i][j]) {
 					boardVec[i][j]->resetMergeStatus();
+				}
+			}
+		}
+	}
+	void Board::resetMovedStatus() {
+		for (uint8_t i = 0; i < 4; i++) {
+			for (uint8_t j = 0; j < 4; j++) {
+				if (boardVec[i][j]) {
+					boardVec[i][j]->resetMoved();
+					boardVec[i][j]->resetMerge();
 				}
 			}
 		}
@@ -134,7 +155,7 @@ namespace GameLogic {
 						// The tile can be moved up or down
 						if (boardVec[k + dI][j] == nullptr) {
 							boardVec[k + dI][j] = boardVec[k][j];
-							boardVec[k][j]->updateOldPosition(k, j);
+							//boardVec[k][j]->updateOldPosition(k, j);
 							boardVec[k][j]->updatePosition(k + dI, j);
 							boardVec[k][j] = nullptr;
 						}
@@ -156,10 +177,10 @@ namespace GameLogic {
 				}
 
 				// The tile can be merged with one above or below
-				else if (boardVec[i][j]->canMerge(
-					*boardVec[i + dI][j])) {  // above tile is mergable
+				else if (boardVec[i][j]->canMerge(*boardVec[i + dI][j])) {  // above tile is mergable
 					moved = true;
 					boardVec[i + dI][j]->doubleVal(i, j);
+					boardVec[i + dI][j]->updateOldPosition(i, j);
 					boardVec[i + dI][j]->updatePosition(i + dI, j);
 					score += static_cast<uint32_t>(
 						std::pow(2, static_cast<uint32_t>(boardVec[i + dI][j]->getVal())));
@@ -177,7 +198,7 @@ namespace GameLogic {
 						// The tile can be moved up or down
 						if (boardVec[k + dI][j] == nullptr) {  // above tile is empty
 							boardVec[k + dI][j] = boardVec[k][j];
-							boardVec[k + dI][j]->updateOldPosition(i, j);
+							//boardVec[k + dI][j]->updateOldPosition(i, j);
 							boardVec[k][j]->updatePosition(k + dI, j);
 							boardVec[k][j] = nullptr;
 						}
@@ -228,7 +249,7 @@ namespace GameLogic {
 
 						if (boardVec[i][k + dJ] == nullptr) {  // left tile is also empty
 							boardVec[i][k + dJ] = boardVec[i][k];
-							boardVec[i][k]->updateOldPosition(i, k);
+							//boardVec[i][k]->updateOldPosition(i, k);
 							boardVec[i][k]->updatePosition(i, k + dJ);
 
 							boardVec[i][k] = nullptr;
@@ -251,11 +272,11 @@ namespace GameLogic {
 
 				//////////
 
-				else if (boardVec[i][j]->canMerge(
-					*boardVec[i][j + dJ])) {  // left tile is mergable
+				else if (boardVec[i][j]->canMerge(*boardVec[i][j + dJ])) {  // left tile is mergable
 					moved = true;
 					boardVec[i][j + dJ]->doubleVal(i, j);
 					boardVec[i][j + dJ]->updatePosition(i, j + dJ);
+					boardVec[i][j + dJ]->updateOldPosition(i, j);
 
 					score += static_cast<uint32_t>(
 						std::pow(2, static_cast<uint32_t>(boardVec[i][j + dJ]->getVal())));
@@ -271,7 +292,7 @@ namespace GameLogic {
 
 						if (boardVec[i][k + dJ] == nullptr) {  // above tile is empty
 							boardVec[i][k + dJ] = boardVec[i][k];
-							boardVec[i][k + dJ]->updateOldPosition(i, k);
+							//boardVec[i][k + dJ]->updateOldPosition(i, k);
 							boardVec[i][k + dJ]->updatePosition(i, k + dJ);
 							boardVec[i][k] = nullptr;
 						}
@@ -313,10 +334,11 @@ namespace GameLogic {
 		return tmpBoard;
 	}
 
-	void Board::makeMove(Direction d) {
+	bool Board::makeMove(Direction d) {
 		if (d == Direction::none)
-			return;
-
+			return true;
+		
+		this->resetMovedStatus();
 		int8_t tmpChanged = tilesChangedUndo;
 		tilesChangedUndo = 0;
 		int8_t tmpScore = ScoreChangedUndo;
@@ -341,7 +363,9 @@ namespace GameLogic {
 		else {
 			tilesChangedUndo = tmpChanged;
 			ScoreChangedUndo = tmpScore;
+			this->resetMovedStatus();
 		}
+		return !move_made;
 	}
 
 	void Board::undoMove() {

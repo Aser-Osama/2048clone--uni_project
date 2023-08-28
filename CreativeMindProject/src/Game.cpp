@@ -38,15 +38,15 @@ namespace Game {
         bool gameRunning = true;
         SDL_Event event;
         while (gameRunning) {
-            uint64_t start = SDL_GetPerformanceCounter();
+            //uint64_t start = SDL_GetPerformanceCounter();
             while (SDL_PollEvent(&event)) {
                 if (event.type == SDL_QUIT || board->isGameComplete()) {
                     gameRunning = false;
                     break;
                 }
                 else if (event.type == SDL_KEYDOWN) {
-                    board->makeMove(keyEvent(event));
-                    gGUI.renderScene(board->getBoard(), board->getScore());
+                    if (board->makeMove(keyEvent(event)));
+                        gGUI.renderScene(board->getBoard(), board->getScore());
                 }
                 else if (event.type == SDL_MOUSEBUTTONDOWN) {
                     this->PressButton();
@@ -54,11 +54,11 @@ namespace Game {
                 }
 
             }
-            uint64_t end = SDL_GetPerformanceCounter();
+            //uint64_t end = SDL_GetPerformanceCounter();
 
-            float elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
+            //float elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
 
-            SDL_Delay(floor(16.666f - elapsedMS));
+            //SDL_Delay(floor(16.666f - elapsedMS));
         }
     }
 

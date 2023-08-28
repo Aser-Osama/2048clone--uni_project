@@ -73,20 +73,77 @@ namespace GUI {
 				if (t) {
 					int8_t val = t->getVal();
 					if (val != -1) {
-						Tiles[index++] = t;
+						if (t->hasMoved())
+							TilesMoved[movedindex++] = t;
+						else
+							Tiles[index++] = t;
 					}
 				}
 			}
 		}
 
-		for (GameLogic::Tile* t : Tiles)
+		for (size_t ii = 0; ii < 20; ii++)
 		{
-			if (!t)
-				break;
+			uint64_t start = SDL_GetPerformanceCounter();
+			this->clear();
+			this->renderBG();
+			this->renderScore(score);
+			
+			for (GameLogic::Tile* t : TilesMoved)
+			{
+				for (GameLogic::Tile* t : TilesMoved)
+				{
+					if (!t)
+						break;
 
-			int i, j, val;
-			SDL_Rect dst, olddst, src;
-			t->getValues(&i, &j, &val);
+					int i, j, val;
+					int o_i, o_j, o_val;
+					int px, pval;
+					SDL_Rect dst, olddst, src;
+					t->getValues(&i, &j, &val);
+					t->getOldValues(&o_i, &o_j, &o_val);
+					
+					if (o_j > j)
+						px = ((o_j)*TILE_W + 50 + (o_j * 4)) - (((o_j * TILE_W + 50 + (o_j * 4)) - (j * TILE_W + 50 + (j * 4))) * ii / 19);
+					else
+						px = ((o_j)*TILE_W + 50 + (o_j * 4)) + (((j * TILE_W + 50 + (j * 4)) - (o_j * TILE_W + 50 + (o_j * 4))) * ii/19);
+
+					if (t->hasMerged())
+						pval = o_val;
+					else
+						pval = val;
+
+					if (ii == 19){
+						pval = val;
+						px = (j)*TILE_W + 50 + (j * 4);
+					}
+
+					dst = {
+						dst.x = px,
+						dst.y = (i)*TILE_H + (i * 4),
+						dst.w = TILE_W,
+						dst.h = TILE_H };
+
+					src = {
+						src.x = (pval - 1) * 177,
+						src.y = 0,
+						src.w = TILE_W,
+						src.h = TILE_H };
+					this->render(tileTexture, &src, &dst);
+				}
+			}
+
+			for (GameLogic::Tile* t : Tiles)
+			{ //this will remain unchanged.
+				if (!t)
+					continue;
+
+				int i, j, val;
+				SDL_Rect dst, olddst, src;
+				//if (t->madeFirstMove())
+				//	t->getOldValues(&i, &j, &val);
+				//else
+					t->getValues(&i, &j, &val);
 
 				dst = {
 					dst.x = (j)*TILE_W + 50 + (j * 4),
@@ -100,8 +157,43 @@ namespace GUI {
 					src.w = TILE_W,
 					src.h = TILE_H };
 				this->render(tileTexture, &src, &dst);
+			}
+			uint64_t end = SDL_GetPerformanceCounter();
+			float elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
+			std::cout << "Current FPS: " << std::to_string(1.0f / elapsedMS) << std::endl;
+			// Cap to 60 FPS
+			this->display();
+			if (floor(16.666f - elapsedMS) > 0)
+				SDL_Delay(floor(16.666f - elapsedMS));
 		}
-		
+	
+		/*for (int8_t i = 0; i < 4; i++) {
+			for (int8_t j = 0; j < 4; j++) {
+				GameLogic::Tile* t = (boardVec)[i][j];
+				if (t) {
+					int8_t val = t->getVal();
+					if (val != -1) {
+						int i, j, val;
+						SDL_Rect dst, olddst, src;
+						t->getValues(&i, &j, &val);
+
+						dst = {
+							dst.x = (j)*TILE_W + 50 + (j * 4),
+							dst.y = (i)*TILE_H + (i * 4),
+							dst.w = TILE_W,
+							dst.h = TILE_H };
+
+						src = {
+							src.x = (val - 1) * 177,
+							src.y = 0,
+							src.w = TILE_W,
+							src.h = TILE_H };
+
+						this->render(tileTexture, &src, &dst);
+					}
+				}
+			}
+		}*/
 	}
 
 	void gameGUI::renderScene(const std::vector<std::vector<GameLogic::Tile*>>& boardVec,
