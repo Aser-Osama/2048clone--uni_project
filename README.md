@@ -1,6 +1,5 @@
-# CreativeMindProject-2048clone
-First experience in game development and SDL2; a simple 2048 clone using C++ and SDL2 <br>
-Can be complied on VS as well as VSCODE using MSBuild
-
-
-#### -Aser Osama 
+# 2048clone
+### A simple clone of the game 2048 built in C++ using SDL2.
+### Requires "MSBuild" to build and compile.
+---
+This project was a part of the "Creative Mind" course, Summer 2022
